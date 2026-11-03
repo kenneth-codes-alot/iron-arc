@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="IRON ARC" />
+  <title>IRON ARC — NNN &amp; 90-Day Dopamine Reboot Protocol</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#07090e" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script>
+    (function () {
+      try {
+        var prod = new URLSearchParams(location.search).get("mode") === "prod";
+        var mobile = window.matchMedia("(max-width: 520px)").matches;
+        if (prod || mobile) document.documentElement.classList.add("studio-dock");
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <!-- Founder studio tools. Compact/collapsible on a real phone and on ?mode=prod. -->
+  <div id="studioBar" class="studio-bar">
+    <button type="button" id="studioToggle" class="studio-toggle" aria-expanded="false" aria-controls="studioTools">Studio</button>
+    <div id="studioTools" class="studio-tools">
+    <span class="studio-label">GTM Studio:</span>
+    <button class="studio-btn" data-jump="quiz">1. Quiz</button>
+    <button class="studio-btn" data-jump="radar">2. 戰鬥表 (Radar)</button>
+    <button class="studio-btn" data-jump="paywall">3. Paywall</button>
+    <button class="studio-btn" data-jump="blocker">4. 🛡️ Porn Blocker</button>
+    <button class="studio-btn" data-jump="lockquote">5. 📱 Lock Screen Quote</button>
+    <button class="studio-btn danger-btn" data-jump="panic">6. 🚨 Panic 2.0</button>
+    <button class="studio-btn" data-jump="iphone">7. 📲 iPhone Install</button>
+    <button class="studio-btn gtm-btn" data-jump="gtm">8. Stripe &amp; Ads</button>
+    <select id="streakPreset" class="studio-select" title="Simulate Streak Day for Ad Recording">
+      <option value="1">Day 1 (Initiate)</option>
+      <option value="3">Day 3 (Withdrawal)</option>
+      <option value="7">Day 7 (Surge)</option>
+      <option value="14" selected>Day 14 (Spartan)</option>
+      <option value="21">Day 21 (Foothold)</option>
+      <option value="30">Day 30 (NNN Titan)</option>
+      <option value="60">Day 60 (Winter Depth)</option>
+      <option value="90">Day 90 (Sovereign)</option>
+    </select>
+    <button id="muteToggleBtn" class="studio-btn" title="Toggle Web Audio &amp; Voice Synthesis">🔊 FX On</button>
+    </div>
+  </div>
+
+  <!-- Main Mobile Viewport — iPhone 16 Pro frame -->
+  <main class="phone-shell">
+    <div class="ios-status" aria-hidden="true">
+      <span class="ios-time">9:41</span>
+      <div class="dynamic-island" id="dynamicIsland">
+        <span id="dynamicIslandLabel" class="di-pill">🛡️ SHIELD ON</span>
+      </div>
+      <span class="ios-signals">5G 🔋</span>
+    </div>
+
+    <header class="top-bar">
+      <div class="brand-mark">
+        <span class="brand-shield">IA</span>
+        <div>
+          <div class="brand-title">IRON ARC</div>
+          <div class="brand-subtitle">NEURO-DISCIPLINE SYSTEM</div>
+        </div>
+      </div>
+      <div class="top-bar-right">
+        <span id="xpPill" class="xp-pill">⚡ 450 XP</span>
+        <span class="season-pill">WINTER ARC '26</span>
+      </div>
+    </header>
+
+    <div id="powerStrip" class="power-strip" hidden>
+      <div id="trialClock" class="ps-clock">⏱️ 24H FREE TRIAL: 24:00:00</div>
+      <div class="ps-pills">
+        <span id="pillBlocker" class="ps-pill is-on">🛡️ Porn Blocker: ON</span>
+        <span id="pillQuote" class="ps-pill is-on">📱 Lock Quote: ON</span>
+      </div>
+      <button id="lockForeverBtn" type="button" class="ps-lock">🔒 Lock Forever</button>
+    </div>
+
+    <div id="viewRoot" class="view-root"></div>
+
+    <nav id="bottomNav" class="bottom-nav" style="display: none;">
+      <button class="nav-tab active" data-tab="blocker" type="button">
+        <span class="nav-icon">🛡️</span>
+        <span>BLOCKER</span>
+      </button>
+      <button class="nav-tab" data-tab="lockquote" type="button">
+        <span class="nav-icon">📱</span>
+        <span>LOCK QUOTE</span>
+      </button>
+      <button class="nav-tab" data-tab="battle" type="button">
+        <span class="nav-icon">📊</span>
+        <span>戰鬥表</span>
+      </button>
+      <button class="nav-tab" data-tab="panic" type="button">
+        <span class="nav-icon">🚨</span>
+        <span>PANIC</span>
+      </button>
+      <button class="nav-tab" data-tab="iphone" type="button">
+        <span class="nav-icon">📲</span>
+        <span>iPHONE</span>
+      </button>
+    </nav>
+
+    <div class="ios-home-indicator" aria-hidden="true"><span></span></div>
+  </main>
+
+  <!-- Modal Root (Downsell & Partner GTM / Stripe Config) -->
+  <div id="modalRoot"></div>
+
+  <script src="./dopamine-fx.js"></script>
+  <script src="./funnel-module.js"></script>
+  <script src="./features-module.js"></script>
+  <script src="./day1-onboarding.js"></script>
+  <script src="./live-app-telemetry.js"></script>
+  <script src="./panic2-engine.js"></script>
+  <script src="./blocker-shield.js"></script>
+  <script src="./lockscreen-widget.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
