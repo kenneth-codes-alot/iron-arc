@@ -782,7 +782,7 @@
       return axis.name + " " + pillar.load;
     }).join(", ");
     return '<div class="fm-radar-stage">' + labels +
-      '<svg class="fm-radar" viewBox="0 0 200 200" role="img" aria-label="戰鬥表 battle radar. ' + escapeHtml(summary) + '">' +
+      '<svg class="fm-radar" viewBox="0 0 200 200" role="img" aria-label="Battle radar. ' + escapeHtml(summary) + '">' +
       '<defs><filter id="fmRadarGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.1" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>' +
       '<polygon points="' + hexagon(hexR) + '" class="fm-radar-hex"></polygon>' +
       grid + axes +
@@ -823,7 +823,7 @@
     }).join("");
     return '<section class="fm-diagnosis fm-battle" data-band="' + escapeHtml(diagnosis.band) + '">' +
       '<p class="fm-kicker">BASELINE READOUT</p>' +
-      "<h2>戰鬥表 • DOPAMINE RADAR</h2>" +
+      "<h2>BATTLE RADAR</h2>" +
       '<div class="fm-gauges">' +
         gaugeMarkup(diagnosis.dependencyScore, "load", "DOPAMINE TAX") +
         gaugeMarkup(base, "base", "PEAK BASELINE") +
