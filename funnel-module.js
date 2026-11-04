@@ -23,9 +23,9 @@
   };
 
   var PILLAR_META = [
-    { id: "focus", label: "Focus & Clarity" },
-    { id: "androgen", label: "Androgen Drive" },
-    { id: "impulse", label: "Impulse Control" },
+    { id: "focus", label: "Mental Clarity" },
+    { id: "androgen", label: "Morning Drive" },
+    { id: "impulse", label: "Impulse Brake" },
     { id: "presence", label: "Social Presence" }
   ];
 
@@ -62,160 +62,160 @@
   var LINK_KEYS = ["annual", "monthly", "downsell", "penaltyStake", "sovereign"];
 
   function iconLabel(icon, text) {
-    return '<span class="fm-ico" aria-hidden="true">' + icon + "</span> " + escapeHtml(text);
+    return '<span class="fm-ico" aria-hidden="true">' + icon + "</span>" + escapeHtml(text);
   }
 
   var QUIZ_STEPS = [
     {
       id: "goal",
-      phase: "Goal",
-      tag: "🎯 GOAL",
-      question: "1. What is your #1 goal?",
-      sub: "Tap one.",
+      phase: "Mission",
+      tag: "01 • MISSION",
+      question: "What brings you to Iron Arc?",
+      sub: "Choose your primary target.",
       ack: "Goal locked.",
       selectionMode: "single",
       minSelections: 1,
       callout: null,
       options: [
-        { id: "nnn", label: iconLabel("🛡️", "Block Porn & NNN"), shortLabel: "Block porn & NNN", badge: "Most Popular", rewireDays: 0 },
-        { id: "fog", label: iconLabel("🧠", "Fix Brain Fog"), shortLabel: "Fix brain fog", badge: "Neuro-Reset", rewireDays: 0 },
-        { id: "discipline", label: iconLabel("👑", "Testosterone & Focus"), shortLabel: "Testosterone & focus", badge: "High Impact", rewireDays: 0 },
-        { id: "redemption", label: iconLabel("🔥", "My Redemption Streak"), shortLabel: "Redemption streak", badge: "Fresh Start", rewireDays: 0 }
+        { id: "nnn", label: iconLabel("🛡️", "Block Porn Permanently"), shortLabel: "Block porn permanently", badge: "#1 Choice", rewireDays: 0 },
+        { id: "fog", label: iconLabel("🧠", "Clear Brain Fog"), shortLabel: "Clear brain fog", badge: "Clarity", rewireDays: 0 },
+        { id: "discipline", label: iconLabel("⚡", "Reclaim Drive & Focus"), shortLabel: "Reclaim drive & focus", badge: "Peak Edge", rewireDays: 0 },
+        { id: "redemption", label: iconLabel("🔥", "Lock A 90-Day Streak"), shortLabel: "Lock a 90-day streak", badge: "Clean Slate", rewireDays: 0 }
       ]
     },
     {
       id: "age",
-      phase: "Age",
-      tag: "📅 AGE",
-      question: "2. Your age bracket?",
-      sub: "18+ only.",
+      phase: "Baseline",
+      tag: "02 • BASELINE",
+      question: "Where are you in your arc?",
+      sub: "Calibrates your recovery curve.",
       ack: "Bracket locked.",
       selectionMode: "single",
       minSelections: 1,
       audience: "18+",
       callout: {
         type: "neuro-fact",
-        kicker: "⚡ STAT",
-        body: "Lock **7 days** and androgen sensitivity stops negotiating with the urge."
+        kicker: "⚡ DAY-7 SURGE",
+        body: "Testosterone sensitivity rebounds **+45%** at **Day 7**."
       },
       options: [
-        { id: "a18", label: iconLabel("⚡", "18–24 Peak"), shortLabel: "18–24", badge: "Prime Years", rewireDays: -7 },
-        { id: "a25", label: iconLabel("🔥", "25–34 Prime"), shortLabel: "25–34", badge: "Peak Bracket", rewireDays: 0 },
-        { id: "a35", label: iconLabel("🛡️", "35–44 Rebuild"), shortLabel: "35–44", badge: "Rebuild", rewireDays: 7 },
-        { id: "a45", label: iconLabel("👑", "45+ Long Game"), shortLabel: "45+", badge: "Long Game", rewireDays: 14 }
+        { id: "a18", label: iconLabel("⚡", "18 – 24"), shortLabel: "18 – 24", badge: "Fastest Rewire", rewireDays: -7 },
+        { id: "a25", label: iconLabel("🔥", "25 – 34"), shortLabel: "25 – 34", badge: "Prime Window", rewireDays: 0 },
+        { id: "a35", label: iconLabel("🛡️", "35 – 44"), shortLabel: "35 – 44", badge: "Deep Reset", rewireDays: 7 },
+        { id: "a45", label: iconLabel("👑", "45+"), shortLabel: "45+", badge: "Sovereign", rewireDays: 14 }
       ]
     },
     {
       id: "frequency",
-      phase: "Urges",
-      tag: "⚡ URGES",
-      question: "3. How often do urges hit?",
-      sub: "Real number.",
+      phase: "Frequency",
+      tag: "03 • FREQUENCY",
+      question: "How often do you slip?",
+      sub: "Zero judgment. Private on-device.",
       ack: "Pattern locked.",
       selectionMode: "single",
       minSelections: 1,
       callout: null,
       options: [
-        { id: "daily", label: iconLabel("🚨", "Hits Every Day"), shortLabel: "Daily urges", badge: "Critical", severity: 96, rewireDays: 6, impact: { focus: 8, androgen: 9, impulse: 10, presence: 6 } },
-        { id: "x3", label: iconLabel("⚠️", "3–5× Weekly"), shortLabel: "3–5× weekly", badge: "Elevated", severity: 78, rewireDays: 3, impact: { focus: 6, androgen: 7, impulse: 7, presence: 4 } },
-        { id: "x1", label: iconLabel("📆", "1–2× Weekly"), shortLabel: "1–2× weekly", badge: "Moderate", severity: 55, rewireDays: 0, impact: { focus: 3, androgen: 3, impulse: 4, presence: 2 } },
-        { id: "rare", label: iconLabel("🏆", "Rare Challenger"), shortLabel: "Rare", badge: "Challenger", severity: 28, rewireDays: -4, impact: { focus: 1, androgen: 1, impulse: 1, presence: 0 } }
+        { id: "daily", label: iconLabel("🚨", "Every Single Day"), shortLabel: "Every single day", badge: "High Load", severity: 96, rewireDays: 6, impact: { focus: 8, androgen: 9, impulse: 10, presence: 6 } },
+        { id: "x3", label: iconLabel("⚠️", "3–5× Per Week"), shortLabel: "3–5× per week", badge: "Looping", severity: 78, rewireDays: 3, impact: { focus: 6, androgen: 7, impulse: 7, presence: 4 } },
+        { id: "x1", label: iconLabel("📆", "Once A Week"), shortLabel: "Once a week", badge: "Breaking Free", severity: 55, rewireDays: 0, impact: { focus: 3, androgen: 3, impulse: 4, presence: 2 } },
+        { id: "rare", label: iconLabel("🛡️", "Rarely — Want Armor"), shortLabel: "Rarely — want armor", badge: "Lock It In", severity: 28, rewireDays: -4, impact: { focus: 1, androgen: 1, impulse: 1, presence: 0 } }
       ]
     },
     {
       id: "escalation",
-      phase: "Escalation",
-      tag: "📈 ESCALATION",
-      question: "4. Does porn escalate for you?",
-      sub: "Be honest.",
+      phase: "Tolerance",
+      tag: "04 • TOLERANCE",
+      question: "Has your tolerance shifted?",
+      sub: "How dopamine dulls the baseline.",
       ack: "Escalation checked.",
       selectionMode: "single",
       minSelections: 1,
       callout: {
         type: "neuro-fact",
-        kicker: "⚡ STAT",
-        body: "Stronger novelty means tired impulse control, and the window retrains in **14 days**."
+        kicker: "🧠 NEURO-FACT",
+        body: "Your prefrontal brake begins physically thickening in **14 days**."
       },
       options: [
-        { id: "novelty", label: iconLabel("📈", "Needs More Novelty"), shortLabel: "Novelty escalated", badge: "Escalating", severity: 94, rewireDays: 6, impact: { focus: 5, androgen: 6, impulse: 12, presence: 4 } },
-        { id: "fade", label: iconLabel("⚡", "Fades Too Fast"), shortLabel: "Relief fades fast", badge: "Desensitized", severity: 84, rewireDays: 4, impact: { focus: 4, androgen: 5, impulse: 9, presence: 3 } },
-        { id: "flat", label: iconLabel("🫥", "Flatline Numb"), shortLabel: "Flatline", badge: "Flatline", severity: 76, rewireDays: 3, impact: { focus: 6, androgen: 8, impulse: 5, presence: 5 } },
-        { id: "stable", label: iconLabel("✅", "No Escalation"), shortLabel: "No escalation", badge: "Stable", severity: 36, rewireDays: 0, impact: { focus: 1, androgen: 1, impulse: 2, presence: 1 } }
+        { id: "novelty", label: iconLabel("📈", "Need Harder Novelty"), shortLabel: "Need harder novelty", badge: "Escalated", severity: 94, rewireDays: 6, impact: { focus: 5, androgen: 6, impulse: 12, presence: 4 } },
+        { id: "fade", label: iconLabel("⏳", "Losing Hours Scrolling"), shortLabel: "Losing hours scrolling", badge: "Time Drain", severity: 84, rewireDays: 4, impact: { focus: 4, androgen: 5, impulse: 9, presence: 3 } },
+        { id: "flat", label: iconLabel("🫥", "Numb Afterwards"), shortLabel: "Numb afterwards", badge: "Depleted", severity: 76, rewireDays: 3, impact: { focus: 6, androgen: 8, impulse: 5, presence: 5 } },
+        { id: "stable", label: iconLabel("✅", "Catching It Early"), shortLabel: "Catching it early", badge: "Controlled", severity: 36, rewireDays: 0, impact: { focus: 1, androgen: 1, impulse: 2, presence: 1 } }
       ]
     },
     {
       id: "symptoms",
-      phase: "Symptoms",
-      tag: "🧠 SYMPTOMS",
-      question: "5. Tap your symptoms:",
-      sub: "Tap every hit.",
+      phase: "Tax",
+      tag: "05 • TAX",
+      question: "Where is it taxing you?",
+      sub: "Select all that apply.",
       ack: "Symptoms locked.",
       selectionMode: "multi",
       minSelections: 1,
       callout: {
         type: "social-proof",
-        kicker: "⚡ STAT",
-        body: "Men who finish **30 days** almost always flag foggy mornings and a late-night window."
+        kicker: "⚡ 30-DAY SHIFT",
+        body: "Morning drive and sharp eye contact return first."
       },
       options: [
-        { id: "fog", label: iconLabel("🧠", "Brain Fog"), shortLabel: "Brain fog", badge: "Dopamine Drop", severity: 74, impact: { focus: 14, androgen: 2, impulse: 3, presence: 3 } },
-        { id: "energy", label: iconLabel("🔋", "Low Energy"), shortLabel: "Low morning drive", badge: "Drive Loss", severity: 70, impact: { focus: 4, androgen: 14, impulse: 2, presence: 2 } },
-        { id: "presence", label: iconLabel("👁️", "Weak Aura"), shortLabel: "Social presence", badge: "Confidence", severity: 72, impact: { focus: 3, androgen: 2, impulse: 3, presence: 14 } },
-        { id: "sleep", label: iconLabel("🌙", "Bad Sleep"), shortLabel: "Night wired, poor sleep", badge: "Cortisol", severity: 66, impact: { focus: 6, androgen: 4, impulse: 8, presence: 4 } },
-        { id: "all", label: iconLabel("☠️", "All Of Them"), shortLabel: "Full stack", badge: "Full Reboot", selectsAll: true }
+        { id: "fog", label: iconLabel("🧠", "Scattered Focus"), shortLabel: "Scattered focus", badge: "Fog", severity: 74, impact: { focus: 14, androgen: 2, impulse: 3, presence: 3 } },
+        { id: "energy", label: iconLabel("🔋", "Flat Morning Drive"), shortLabel: "Flat morning drive", badge: "Low Drive", severity: 70, impact: { focus: 4, androgen: 14, impulse: 2, presence: 2 } },
+        { id: "presence", label: iconLabel("👁️", "Muted Eye Contact"), shortLabel: "Muted eye contact", badge: "Presence", severity: 72, impact: { focus: 3, androgen: 2, impulse: 3, presence: 14 } },
+        { id: "sleep", label: iconLabel("🌙", "Wrecked Sleep"), shortLabel: "Wrecked sleep", badge: "Late Nights", severity: 66, impact: { focus: 6, androgen: 4, impulse: 8, presence: 4 } },
+        { id: "all", label: iconLabel("⚡", "All Of The Above"), shortLabel: "All of the above", badge: "Full Reset", selectsAll: true }
       ]
     },
     {
       id: "trigger",
-      phase: "Danger Hour",
-      tag: "🌙 DANGER HOUR",
-      question: "6. When is your danger hour?",
-      sub: "Name the hour.",
+      phase: "Trigger",
+      tag: "06 • TRIGGER",
+      question: "When does the urge strike?",
+      sub: "We arm your lock screen before it hits.",
       ack: "Trigger window armed.",
       selectionMode: "single",
       minSelections: 1,
       callout: null,
       options: [
-        { id: "night", label: iconLabel("🛏️", "10PM–2AM Bed"), shortLabel: "10 PM–2 AM", badge: "Danger Window", severity: 90, rewireDays: 2, impact: { focus: 6, androgen: 2, impulse: 10, presence: 3 } },
-        { id: "feed", label: iconLabel("📱", "After The Feed"), shortLabel: "After the feed", badge: "Algorithmic", severity: 80, rewireDays: 1, impact: { focus: 5, androgen: 1, impulse: 8, presence: 2 } },
-        { id: "stress", label: iconLabel("😤", "Stress Or Lonely"), shortLabel: "Stress or loneliness", badge: "Cortisol Spike", severity: 70, rewireDays: 0, impact: { focus: 4, androgen: 2, impulse: 6, presence: 5 } },
-        { id: "weekend", label: iconLabel("📅", "Idle Weekends"), shortLabel: "Open weekends", badge: "Idle Risk", severity: 48, rewireDays: 0, impact: { focus: 2, androgen: 1, impulse: 3, presence: 2 } }
+        { id: "night", label: iconLabel("🌙", "Late Night In Bed"), shortLabel: "Late night in bed", badge: "11 PM – 2 AM", severity: 90, rewireDays: 2, impact: { focus: 6, androgen: 2, impulse: 10, presence: 3 } },
+        { id: "feed", label: iconLabel("📱", "Doomscrolling X / IG"), shortLabel: "Doomscrolling X / IG", badge: "Feed Trap", severity: 80, rewireDays: 1, impact: { focus: 5, androgen: 1, impulse: 8, presence: 2 } },
+        { id: "stress", label: iconLabel("⚡", "Stressed Or Alone"), shortLabel: "Stressed or alone", badge: "Cortisol", severity: 70, rewireDays: 0, impact: { focus: 4, androgen: 2, impulse: 6, presence: 5 } },
+        { id: "weekend", label: iconLabel("📅", "Unstructured Weekends"), shortLabel: "Unstructured weekends", badge: "Idle Hours", severity: 48, rewireDays: 0, impact: { focus: 2, androgen: 1, impulse: 3, presence: 2 } }
       ]
     },
     {
       id: "attempts",
-      phase: "Streak",
-      tag: "🏆 STREAK",
-      question: "7. Past streak record?",
-      sub: "Your record.",
+      phase: "Record",
+      tag: "07 • RECORD",
+      question: "Longest streak on willpower alone?",
+      sub: "Willpower fades. Systems don't.",
       ack: "History logged.",
       selectionMode: "single",
       minSelections: 1,
       callout: {
         type: "social-proof",
-        kicker: "⚡ STAT",
-        body: "**84%** of solo restarts fold before **Day 8**."
+        kicker: "🛡️ WHY MEN FOLD",
+        body: "Blocking the URL + Lock Screen reminders **3.4×** completion."
       },
       options: [
-        { id: "week1", label: iconLabel("💥", "Folds By Day 7"), shortLabel: "Folds before day 7", badge: "Week-One Fold", severity: 92, rewireDays: 12, impact: { focus: 3, androgen: 2, impulse: 10, presence: 4 } },
-        { id: "week2", label: iconLabel("🧱", "Week Two Wall"), shortLabel: "Folds in week two", badge: "Week-Two Wall", severity: 78, rewireDays: 6, impact: { focus: 2, androgen: 2, impulse: 8, presence: 3 } },
-        { id: "once", label: iconLabel("🔁", "Hit 30 Once"), shortLabel: "One 30-day finish", badge: "Relapse", severity: 58, rewireDays: 2, impact: { focus: 2, androgen: 2, impulse: 5, presence: 3 } },
-        { id: "first", label: iconLabel("🌱", "First Attempt"), shortLabel: "First structured attempt", badge: "Fresh Protocol", severity: 34, rewireDays: -8, impact: { focus: 0, androgen: 0, impulse: 1, presence: 1 } }
+        { id: "week1", label: iconLabel("💥", "Fold Under 7 Days"), shortLabel: "Fold under 7 days", badge: "Day-4 Wall", severity: 92, rewireDays: 12, impact: { focus: 3, androgen: 2, impulse: 10, presence: 4 } },
+        { id: "week2", label: iconLabel("🧱", "Stall Around Day 14"), shortLabel: "Stall around day 14", badge: "Week 2 Wall", severity: 78, rewireDays: 6, impact: { focus: 2, androgen: 2, impulse: 8, presence: 3 } },
+        { id: "once", label: iconLabel("🔁", "30+ Days, Then Slipped"), shortLabel: "30+ days, then slipped", badge: "Rebuild", severity: 58, rewireDays: 2, impact: { focus: 2, androgen: 2, impulse: 5, presence: 3 } },
+        { id: "first", label: iconLabel("⚔️", "First Real Protocol"), shortLabel: "First real protocol", badge: "Day One", severity: 34, rewireDays: -8, impact: { focus: 0, androgen: 0, impulse: 1, presence: 1 } }
       ]
     },
     {
       id: "pact",
-      phase: "Lock In",
-      tag: "🛡️ LOCK IN",
-      question: "8. Ready to block porn & lock?",
-      sub: "Two weapons next.",
+      phase: "Pact",
+      tag: "08 • THE PACT",
+      question: "Ready to arm your iPhone?",
+      sub: "Sign below and tap to lock in.",
       ack: "Pact recorded.",
       selectionMode: "single",
       minSelections: 1,
       callout: null,
       options: [
-        { id: "sign", label: iconLabel("🛡️", "Block & Lock In"), shortLabel: "Pact signed", badge: "100% Ready", commitment: "signed", rewireDays: -3 },
-        { id: "report", label: iconLabel("📊", "Show Score First"), shortLabel: "Wants the score first", badge: "View Report", commitment: "report", rewireDays: 0 }
+        { id: "sign", label: iconLabel("🛡️", "Arm My Shield Now"), shortLabel: "Arm my shield now", badge: "Locked In", commitment: "signed", rewireDays: -3 },
+        { id: "report", label: iconLabel("📊", "Reveal My Radar First"), shortLabel: "Reveal my radar first", badge: "See Score", commitment: "report", rewireDays: 0 }
       ]
     }
   ];
@@ -730,10 +730,10 @@
   }
 
   var COMBAT_AXES = {
-    focus: { icon: "🧠", name: "FOCUS", slot: "n", color: "#38bdf8" },
-    androgen: { icon: "🔥", name: "DRIVE", slot: "e", color: "#fb7185" },
+    focus: { icon: "🧠", name: "CLARITY", slot: "n", color: "#38bdf8" },
+    androgen: { icon: "⚡", name: "DRIVE", slot: "e", color: "#fb7185" },
     impulse: { icon: "🛡️", name: "CONTROL", slot: "s", color: "#34d399" },
-    presence: { icon: "👑", name: "AURA", slot: "w", color: "#fbbf24" }
+    presence: { icon: "👑", name: "PRESENCE", slot: "w", color: "#c4b5fd" }
   };
 
   function radarMarkup(pillars) {
@@ -783,7 +783,7 @@
     }).join(", ");
     return '<div class="fm-radar-stage">' + labels +
       '<svg class="fm-radar" viewBox="0 0 200 200" role="img" aria-label="戰鬥表 battle radar. ' + escapeHtml(summary) + '">' +
-      '<defs><filter id="fmRadarGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="2.4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>' +
+      '<defs><filter id="fmRadarGlow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.1" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>' +
       '<polygon points="' + hexagon(hexR) + '" class="fm-radar-hex"></polygon>' +
       grid + axes +
       '<polygon points="' + diamond(HEALTHY_BASELINE) + '" class="fm-radar-base"></polygon>' +
@@ -793,21 +793,21 @@
       "</svg></div>";
   }
 
-  function gaugeMarkup(pct, tone, icon, name) {
+  function gaugeMarkup(pct, tone, name) {
     var value = clamp(Math.round(pct), 0, 100);
     return '<div class="fm-gauge is-' + tone + '">' +
       '<div class="fm-dial" style="--pct:' + value + '" role="img" aria-label="' + escapeHtml(name) + " " + value + '%">' +
       "<b>" + value + "%</b></div>" +
-      '<span class="fm-gauge-name"><i class="fm-gauge-ico" aria-hidden="true">' + icon + "</i>" + escapeHtml(name) + "</span></div>";
+      '<span class="fm-gauge-name">' + escapeHtml(name) + "</span></div>";
   }
 
   function weaponsMarkup() {
     return '<div class="fm-weapons">' +
-      '<p class="fm-kicker">2-Weapon Prescription</p>' +
+      '<p class="fm-kicker">YOUR 2-WEAPON SYSTEM</p>' +
       '<article class="fm-weapon"><span class="fm-weapon-ico" aria-hidden="true">🛡️</span>' +
-      '<span class="fm-weapon-copy"><strong>WEAPON 1</strong><b>1-Tap Porn URL Blocker</b><em>Blocks 42,000+ Adult Sites</em></span></article>' +
+      '<span class="fm-weapon-copy"><strong>01 • URL SHIELD</strong><b>Hard Porn URL Blocker</b><em>Kills 42,850+ Sites in Safari</em></span></article>' +
       '<article class="fm-weapon"><span class="fm-weapon-ico" aria-hidden="true">📱</span>' +
-      '<span class="fm-weapon-copy"><strong>WEAPON 2</strong><b>Lock Screen Stoic Quote Box</b><em>24/7 Mental Armor</em></span></article>' +
+      '<span class="fm-weapon-copy"><strong>02 • LOCK SCREEN</strong><b>Stoic Lock Screen Widget</b><em>Live Quote + Streak on Every Glance</em></span></article>' +
       "</div>";
   }
 
@@ -822,11 +822,11 @@
         "</li>";
     }).join("");
     return '<section class="fm-diagnosis fm-battle" data-band="' + escapeHtml(diagnosis.band) + '">' +
-      '<p class="fm-kicker">Battle stats</p>' +
-      "<h2>戰鬥表</h2>" +
+      '<p class="fm-kicker">BASELINE READOUT</p>' +
+      "<h2>戰鬥表 • DOPAMINE RADAR</h2>" +
       '<div class="fm-gauges">' +
-        gaugeMarkup(diagnosis.dependencyScore, "load", "🚨", "PORN BRAIN LOAD") +
-        gaugeMarkup(base, "base", "✅", "HEALTHY BASELINE") +
+        gaugeMarkup(diagnosis.dependencyScore, "load", "DOPAMINE TAX") +
+        gaugeMarkup(base, "base", "PEAK BASELINE") +
         '<span class="fm-vs" aria-hidden="true">VS</span>' +
       "</div>" +
       radarMarkup(diagnosis.pillars || []) +
@@ -1589,9 +1589,9 @@
     ".fm-callout[data-type='neuro-fact']{background:rgba(99,102,241,.1);border-color:rgba(99,102,241,.35)}",
     ".fm-callout p{margin:0;color:var(--text-muted,#94a3b8);font-size:13px;line-height:1.45}",
     ".fm-callout strong{color:#f8fafc;font-weight:900}",
-    ".quiz-option > span:first-child{font-size:15px;font-weight:800;letter-spacing:-.01em;line-height:1.15}",
+    ".quiz-option > span:first-child{font-size:15px;font-weight:800;letter-spacing:-.01em;line-height:1.2}",
     ".quiz-option{min-height:62px}",
-    ".quiz-option .fm-ico{font-size:34px;line-height:1;display:inline-block;width:1.15em;margin-right:10px;text-align:center;vertical-align:-9px}",
+    ".quiz-option .fm-ico{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.07);font-size:16px;line-height:1;margin-right:11px;vertical-align:middle;flex-shrink:0}",
     ".fm-loader h2,.fm-diagnosis h2,.fm-sheet h2{font-size:22px;line-height:1.25;margin:0 0 8px}",
     ".fm-track{position:relative;height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}",
     ".fm-track i{display:block;height:100%;width:0;border-radius:inherit;background:#ef4444;transition:width .12s linear}",
@@ -1611,20 +1611,19 @@
     ".fm-diagnosis h2 span{color:#ef4444}",
     ".fm-compare{display:grid;gap:10px;margin:14px 0}",
     ".fm-compare span{font-size:12px;color:var(--text-muted,#94a3b8)}",
-    ".fm-battle{position:relative;padding:8px 4px 2px;border-radius:16px;background:radial-gradient(circle at 50% 22%, rgba(239,68,68,.2), transparent 46%), linear-gradient(180deg,#141a28 0%,#090d16 100%);border:1px solid rgba(251,191,36,.55);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05), 0 0 28px rgba(239,68,68,.16)}",
-    ".fm-battle h2{text-align:center;letter-spacing:.16em;font-size:28px;line-height:1;margin:0 0 2px}",
-    ".fm-battle .fm-kicker{text-align:center;color:#fbbf24;letter-spacing:.14em}",
-    ".fm-gauges{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 2px}",
+    ".fm-battle{position:relative;background:rgba(14,19,31,0.85);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:18px 16px}",
+    ".fm-battle h2{text-align:center;letter-spacing:.08em;font-size:clamp(14px,4.3vw,18px);line-height:1.2;margin:0 0 4px;font-weight:800}",
+    ".fm-battle .fm-kicker{text-align:center;color:#94a3b8;letter-spacing:.16em}",
+    ".fm-gauges{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 2px}",
     ".fm-gauge{text-align:center}",
-    ".fm-dial{width:min(124px, 36vw);height:min(124px, 36vw);margin:0 auto 6px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(from -90deg, var(--dial,#ef4444) calc(var(--pct) * 1%), rgba(255,255,255,.1) 0);box-shadow:0 0 24px var(--glow, rgba(239,68,68,.4))}",
-    ".fm-dial b{width:71%;height:71%;border-radius:50%;display:grid;place-items:center;background:#070b12;color:#f8fafc;font-size:clamp(18px, 5.4vw, 28px);font-weight:900;letter-spacing:-.04em;box-shadow:inset 0 0 0 2px rgba(255,255,255,.06)}",
-    ".fm-gauge.is-load{--dial:#ef4444;--glow:rgba(239,68,68,.5)}",
-    ".fm-gauge.is-base{--dial:#10b981;--glow:rgba(16,185,129,.4)}",
-    ".fm-gauge.is-load .fm-dial b{color:#fca5a5}",
+    ".fm-dial{width:104px;height:104px;margin:0 auto 8px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(from -90deg, var(--dial,#f43f5e) calc(var(--pct) * 1%), rgba(255,255,255,.1) 0);box-shadow:0 0 16px var(--glow, rgba(244,63,94,.35))}",
+    ".fm-dial b{width:80%;height:80%;border-radius:50%;display:grid;place-items:center;background:#070b12;color:#f8fafc;font-size:22px;font-weight:900;letter-spacing:-.04em;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}",
+    ".fm-gauge.is-load{--dial:#f43f5e;--glow:rgba(244,63,94,.4)}",
+    ".fm-gauge.is-base{--dial:#10b981;--glow:rgba(16,185,129,.32)}",
+    ".fm-gauge.is-load .fm-dial b{color:#fecdd3}",
     ".fm-gauge.is-base .fm-dial b{color:#6ee7b7}",
-    ".fm-gauge-name{display:block;max-width:148px;margin:0 auto;font-size:11px;font-weight:900;letter-spacing:.05em;line-height:1.2;color:#f8fafc}",
-    ".fm-gauge-ico{display:block;margin-bottom:3px;font-size:26px;font-style:normal;line-height:1}",
-    ".fm-vs{position:absolute;left:50%;top:58px;transform:translate(-50%,-50%);z-index:1;font-size:11px;font-weight:900;letter-spacing:.16em;color:#fbbf24;background:#070b12;border:1px solid rgba(251,191,36,.7);border-radius:99px;padding:3px 7px}",
+    ".fm-gauge-name{display:block;max-width:148px;margin:0 auto;font-size:11px;font-weight:900;letter-spacing:.06em;line-height:1.2;color:#e2e8f0}",
+    ".fm-vs{position:absolute;left:50%;top:52px;transform:translate(-50%,-50%);z-index:1;font-size:10px;font-weight:900;letter-spacing:.16em;color:#cbd5e1;background:#0e131f;border:1px solid rgba(255,255,255,.14);border-radius:99px;padding:3px 7px}",
     ".fm-radar-stage{display:grid;grid-template-columns:72px minmax(0,1fr) 72px;grid-template-rows:auto minmax(176px,1fr) auto;align-items:center;justify-items:center;width:100%;max-width:420px;margin:8px auto 0}",
     ".fm-radar{grid-column:2;grid-row:2;width:100%;height:auto;display:block;overflow:visible}",
     ".fm-axis{text-align:center;line-height:1;text-shadow:0 2px 10px rgba(0,0,0,.9)}",
@@ -1635,16 +1634,16 @@
     ".fm-axis-s{grid-column:2;grid-row:3;margin-top:-4px}",
     ".fm-axis-w{grid-column:1;grid-row:2;margin-right:-6px}",
     ".fm-axis-n span{color:#7dd3fc}",
-    ".fm-axis-e span{color:#fb7185}",
-    ".fm-axis-s span{color:#34d399}",
-    ".fm-axis-w span{color:#fbbf24}",
-    ".fm-radar-ring{fill:none;stroke:rgba(255,255,255,.28);stroke-width:1.15}",
-    ".fm-radar-hex{fill:rgba(251,191,36,.05);stroke:#fbbf24;stroke-width:1.7}",
-    ".fm-radar-axis{stroke:rgba(251,191,36,.55);stroke-width:1.3}",
-    ".fm-radar-base{fill:rgba(16,185,129,.08);stroke:#34d399;stroke-width:1.8;stroke-dasharray:3 2.5}",
-    ".fm-radar-fill{fill:rgba(239,68,68,.5);stroke:#ff2d2d;stroke-width:3}",
-    ".fm-radar-dot{fill:#fff;stroke:#ff2d2d;stroke-width:2}",
-    ".fm-radar-core{fill:#fbbf24}",
+    ".fm-axis-e span{color:#fda4af}",
+    ".fm-axis-s span{color:#6ee7b7}",
+    ".fm-axis-w span{color:#d8b4fe}",
+    ".fm-radar-ring{fill:none;stroke:rgba(255,255,255,0.12);stroke-width:1}",
+    ".fm-radar-hex{fill:none;stroke:rgba(255,255,255,0.12);stroke-width:1}",
+    ".fm-radar-axis{stroke:rgba(255,255,255,0.12);stroke-width:1}",
+    ".fm-radar-base{fill:rgba(16,185,129,.06);stroke:#34d399;stroke-width:1.4;stroke-dasharray:3 2.5}",
+    ".fm-radar-fill{stroke:#f43f5e;fill:rgba(244,63,94,0.22);stroke-width:1.6}",
+    ".fm-radar-dot{fill:#fff;stroke:#f43f5e;stroke-width:1.5}",
+    ".fm-radar-core{fill:#f8fafc}",
     ".fm-pillars,.fm-checks-list{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-direction:column;gap:10px}",
     ".fm-pillar-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;margin-bottom:4px}",
     ".fm-battle .fm-pillars{gap:7px;margin:8px 2px 0}",
@@ -1653,13 +1652,13 @@
     ".fm-battle .fm-track{height:12px;background:rgba(255,255,255,.08);overflow:visible}",
     ".fm-pillars small,.fm-disclaimer,.fm-note{color:var(--text-dim,#64748b);font-size:12px;line-height:1.4}",
     ".fm-battle .fm-disclaimer{margin:10px 0 2px;text-align:center}",
-    ".fm-weapons{display:grid;gap:8px;margin:14px 2px 0}",
-    ".fm-weapon{display:flex;gap:10px;align-items:center;padding:11px 12px;border-radius:14px;background:linear-gradient(180deg, rgba(16,185,129,.18), rgba(16,185,129,.05));border:1px solid rgba(52,211,153,.55);box-shadow:0 0 18px rgba(16,185,129,.14)}",
-    ".fm-weapon-ico{font-size:32px;width:42px;text-align:center;flex:none;line-height:1}",
+    ".fm-weapons{display:grid;gap:8px;margin:14px 0 0}",
+    ".fm-weapon{display:flex;gap:10px;align-items:center;padding:12px;border-radius:14px;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08)}",
+    ".fm-weapon-ico{font-size:18px;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none;line-height:1;background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.07)}",
     ".fm-weapon-copy{display:flex;flex-direction:column;gap:1px;min-width:0}",
-    ".fm-weapon-copy strong{font-size:10px;letter-spacing:.14em;color:#34d399}",
-    ".fm-weapon-copy b{font-size:14px;line-height:1.25;color:#f8fafc}",
-    ".fm-weapon-copy em{font-style:normal;font-size:12px;font-weight:800;color:#fbbf24}",
+    ".fm-weapon-copy strong{font-size:10px;letter-spacing:.14em;color:#8fb8aa}",
+    ".fm-weapon-copy b{font-size:14px;line-height:1.25;color:#f8fafc;font-weight:800}",
+    ".fm-weapon-copy em{font-style:normal;font-size:12px;font-weight:600;color:#94a3b8}",
     ".fm-target{margin-top:14px}",
     ".fm-overlay{position:fixed;inset:0;z-index:240;background:rgba(2,6,14,.72);display:flex;align-items:flex-end;justify-content:center}",
     ".fm-overlay-contained{position:fixed;inset:auto}",

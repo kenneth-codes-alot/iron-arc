@@ -8,7 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="IRON ARC" />
   <title>IRON ARC — NNN &amp; 90-Day Dopamine Reboot Protocol</title>
   <link rel="manifest" href="./manifest.webmanifest" />
-  <meta name="theme-color" content="#07090e" />
+  <meta name="theme-color" content="#05070a" />
   <link rel="stylesheet" href="./styles.css" />
   <script>
     (function () {
@@ -58,51 +58,78 @@
       <span class="ios-signals">5G 🔋</span>
     </div>
 
-    <header class="top-bar">
+    <header class="top-bar is-funnel">
       <div class="brand-mark">
-        <span class="brand-shield">IA</span>
-        <div>
+        <span class="brand-shield" aria-hidden="true">IA</span>
+        <div class="brand-copy">
           <div class="brand-title">IRON ARC</div>
-          <div class="brand-subtitle">NEURO-DISCIPLINE SYSTEM</div>
+          <div class="brand-subtitle">PORN SHIELD • STOIC LOCK</div>
         </div>
       </div>
       <div class="top-bar-right">
-        <span id="xpPill" class="xp-pill">⚡ 450 XP</span>
-        <span class="season-pill">WINTER ARC '26</span>
+        <span id="headerStreakPill" class="streak-pill">DAY 14 • SPARTAN</span>
+        <span id="xpPill" class="xp-pill">450 XP</span>
       </div>
     </header>
 
     <div id="powerStrip" class="power-strip" hidden>
-      <div id="trialClock" class="ps-clock">⏱️ 24H FREE TRIAL: 24:00:00</div>
-      <div class="ps-pills">
+      <div id="trialClock" class="ps-clock">⏱️ 24H FREE PASS: 23:59:10</div>
+      <div class="ps-pills" aria-hidden="true">
         <span id="pillBlocker" class="ps-pill is-on">🛡️ Porn Blocker: ON</span>
         <span id="pillQuote" class="ps-pill is-on">📱 Lock Quote: ON</span>
       </div>
-      <button id="lockForeverBtn" type="button" class="ps-lock">🔒 Lock Forever</button>
+      <button id="lockForeverBtn" type="button" class="ps-lock">🔒 Keep Shield On</button>
     </div>
 
     <div id="viewRoot" class="view-root"></div>
 
     <nav id="bottomNav" class="bottom-nav" style="display: none;">
       <button class="nav-tab active" data-tab="blocker" type="button">
-        <span class="nav-icon">🛡️</span>
-        <span>BLOCKER</span>
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3.2 19 6.2v5.6c0 4.2-2.7 7.2-7 8.6-4.3-1.4-7-4.4-7-8.6V6.2l7-3z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </span>
+        <span>SHIELD</span>
       </button>
       <button class="nav-tab" data-tab="lockquote" type="button">
-        <span class="nav-icon">📱</span>
-        <span>LOCK QUOTE</span>
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="7" y="2.2" width="10" height="19.6" rx="2.2"/>
+            <rect x="9.2" y="10.2" width="5.6" height="4.4" rx="0.8"/>
+            <path d="M10.3 10.2V8.8a1.7 1.7 0 0 1 3.4 0v1.4"/>
+          </svg>
+        </span>
+        <span>LOCK SCREEN</span>
       </button>
       <button class="nav-tab" data-tab="battle" type="button">
-        <span class="nav-icon">📊</span>
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2.8 20.2 7.6 20.2 16.4 12 21.2 3.8 16.4 3.8 7.6"/>
+            <polygon points="12 7 16.4 9.6 16.4 14.6 12 17.2 7.6 14.6 7.6 9.6"/>
+            <circle cx="12" cy="12.1" r="1.15" fill="currentColor" stroke="none"/>
+          </svg>
+        </span>
         <span>戰鬥表</span>
       </button>
       <button class="nav-tab" data-tab="panic" type="button">
-        <span class="nav-icon">🚨</span>
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12h3.2l2.2-5 3.6 10 2.3-5H21"/>
+          </svg>
+        </span>
         <span>PANIC</span>
       </button>
       <button class="nav-tab" data-tab="iphone" type="button">
-        <span class="nav-icon">📲</span>
-        <span>iPHONE</span>
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.2"/>
+            <path d="M12 6.8v6.2"/>
+            <path d="m9.4 10.8 2.6 2.6 2.6-2.6"/>
+          </svg>
+        </span>
+        <span>INSTALL</span>
       </button>
     </nav>
 

@@ -20,36 +20,58 @@ self.addEventListener("message", (event) => {
   if (data.xml.indexOf("https://family.cloudflare-dns.com/dns-query") === -1) return;
   if (data.xml.indexOf("com.apple.dnsSettings.managed") === -1) return;
   if (data.xml.indexOf("<!DOCTYPE plist") === -1) return;
+  if (data.xml.indexOf("<true/>") !== -1) return;
   pendingProfile = data.xml;
   if (event.ports && event.ports[0]) event.ports[0].postMessage({ ok: true });
 });
 
-function profileResponse() {
-  if (!pendingProfile) {
-    return new Response("Profile not ready", {
+function profileHeaders() {
+  return {
+    "Content-Type": "application/x-apple-aspen-config",
+    "Content-Disposition": 'attachment; filename="iron-arc-shield.mobileconfig"',
+    "Cache-Control": "no-store"
+  };
+}
+
+function memoryProfileResponse() {
+  return new Response(pendingProfile, {
+    status: 200,
+    headers: profileHeaders()
+  });
+}
+
+// Private browsing and the moment before this worker claims the tab never
+// reach here — the host serves iron-arc-shield.mobileconfig directly.
+// Once this worker is in control, prefer the profile just posted by the page.
+// Otherwise stamp the static file with Apple's profile MIME type.
+function staticProfileResponse(request) {
+  return fetch(request).then((res) => {
+    const headers = new Headers(res.headers);
+    headers.set("Content-Type", "application/x-apple-aspen-config");
+    headers.set("Content-Disposition", 'attachment; filename="iron-arc-shield.mobileconfig"');
+    headers.set("Cache-Control", "no-store");
+    return new Response(res.body, {
+      status: res.status,
+      statusText: res.statusText,
+      headers: headers
+    });
+  }).catch(() => caches.match(request).then((cached) => {
+    if (cached) return cached;
+    return new Response("Profile unavailable", {
       status: 404,
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
         "Cache-Control": "no-store"
       }
     });
-  }
-  return new Response(pendingProfile, {
-    status: 200,
-    headers: {
-      "Content-Type": "application/x-apple-aspen-config",
-      "Content-Disposition": 'attachment; filename="IRON-ARC-Shield.mobileconfig"',
-      "Cache-Control": "no-store"
-    }
-  });
+  }));
 }
 
 // Network-first strategy so live edits and GTM updates appear immediately.
-// The shield profile is served from memory so iOS sees the DNS payload MIME type.
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (url.pathname.endsWith("/iron-arc-shield.mobileconfig")) {
-    event.respondWith(profileResponse());
+    event.respondWith(pendingProfile ? memoryProfileResponse() : staticProfileResponse(event.request));
     return;
   }
 

@@ -83,8 +83,15 @@ function formatSubClock(totalSeconds) {
 function updateXPPill() {
   const pill = document.getElementById("xpPill");
   if (pill) {
-    pill.textContent = `⚡ ${state.willpowerXP} XP`;
+    pill.textContent = `${state.willpowerXP} XP`;
   }
+}
+
+function syncHeaderStreak() {
+  const pill = document.getElementById("headerStreakPill");
+  if (!pill) return;
+  const rank = getRank(state.streakDays);
+  pill.textContent = `DAY ${state.streakDays} • ${rank.name}`;
 }
 
 const LIVE_TABS = ["blocker", "lockquote", "battle", "panic", "iphone"];
@@ -144,7 +151,7 @@ function syncTrialStrip() {
   const clock = document.getElementById("trialClock");
   const rem = snap.remaining;
   if (clock) {
-    clock.textContent = `⏱️ 24H FREE TRIAL: ${pad2(rem.h)}:${pad2(rem.m)}:${pad2(rem.s)}`;
+    clock.textContent = `⏱️ 24H FREE PASS: ${pad2(rem.h)}:${pad2(rem.m)}:${pad2(rem.s)}`;
   }
   const weapons = weaponStatus();
   const blocker = document.getElementById("pillBlocker");
@@ -274,9 +281,12 @@ function render() {
   if (window.BlockerShield) window.BlockerShield.unmount();
 
   updateXPPill();
+  syncHeaderStreak();
 
   const root = document.getElementById("viewRoot");
   const bottomNav = document.getElementById("bottomNav");
+  const topBar = document.querySelector(".top-bar");
+  if (topBar) topBar.classList.toggle("is-funnel", state.screen !== "app");
 
   document.querySelectorAll(".studio-btn[data-jump]").forEach((btn) => {
     btn.classList.toggle("active", studioIsActive(btn.dataset.jump));
@@ -318,13 +328,13 @@ function renderQuiz(root) {
   const calloutHTML = step.callout ? window.FunnelModule.renderCalloutHTML(step.callout) : "";
 
   root.innerHTML = `
-    ${idx === 0 ? renderHoloPass("Unclaimed Pass • Complete 60s Assessment to Lock") : ""}
     <div class="quiz-header-row">
-      ${idx > 0 ? `<button id="quizBackBtn" class="quiz-back-btn">← Back</button>` : `<span></span>`}
-      <span style="font-size:11px; color:var(--text-dim); font-weight:700;">${idx + 1} / ${steps.length}</span>
-    </div>
-    <div class="quiz-progress-wrap">
-      <div class="quiz-progress-fill" style="width: ${pct}%"></div>
+      ${idx > 0 ? `<button id="quizBackBtn" class="quiz-back-btn" type="button">← Back</button>` : `<span class="quiz-back-spacer" aria-hidden="true"></span>`}
+      <div class="quiz-progress-wrap" role="progressbar" aria-valuenow="${idx + 1}" aria-valuemin="1" aria-valuemax="${steps.length}">
+        <div class="quiz-progress-fill" style="width: ${pct}%"></div>
+        <span class="quiz-progress-dot" style="left: ${pct}%"></span>
+      </div>
+      <span class="quiz-step-count">${pad2(idx + 1)} / ${pad2(steps.length)}</span>
     </div>
     <div class="quiz-step-tag">${step.tag}</div>
     <h1 class="quiz-question">${step.question}</h1>
@@ -351,6 +361,7 @@ function renderQuiz(root) {
     ${
       isFinalStep
         ? `
+      ${renderHoloPass("24/7 URL Shield • Lock Screen Armor")}
       <div class="sig-card">
         <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--accent-emerald-bright); font-weight:800; margin-bottom:6px;">
           <span>✍️ SIGN YOUR 30/90-DAY IRON PACT BELOW</span>
@@ -506,10 +517,8 @@ function renderDiagnosis(root) {
   const diagHTML = window.FunnelModule.renderDiagnosisHTML(diagnosis);
 
   root.innerHTML = `
-    <div class="report-card" style="padding: 16px;">
-      ${diagHTML}
-    </div>
-    <button id="toPaywallBtn" class="btn-primary">Lock In My 30/90-Day Recovery Plan →</button>
+    ${diagHTML}
+    <button id="toPaywallBtn" class="btn-primary diagnosis-cta" type="button">Arm My 2 Weapons →</button>
   `;
 
   document.getElementById("toPaywallBtn").addEventListener("click", () => {
@@ -527,66 +536,61 @@ function renderPaywall(root) {
 
   root.innerHTML = `
     <div class="paywall-header">
-      <span class="quiz-step-tag" style="margin:0;">IRON ARC PRO</span>
+      <span class="quiz-step-tag" style="margin:0;">IRON ARC • PRO</span>
       <button id="paywallCloseBtn" class="paywall-close" title="Triggers 50% Exit-Intent Offer">✕</button>
     </div>
 
-    <h1 class="tab-headline">Arm Both Weapons</h1>
+    <h1 class="tab-headline">Guard Your Eyes. Rule Your Mind.</h1>
     <div class="weapon-duo">
       <article class="weapon-card weapon-card-shield">
-        <div class="weapon-art" aria-hidden="true">
-          <span class="weapon-orb">🛡️</span>
-          <span class="weapon-bars"><i></i><i></i><i></i><i></i></span>
-        </div>
-        <h2>🛡️ PORN URL BLOCKER</h2>
-        <p>42,850+ Sites Blocked • Safari + Incognito</p>
+        <h2>🛡️ PORN URL SHIELD</h2>
+        <p>42,850+ Adult Sites Dead on Arrival</p>
       </article>
       <article class="weapon-card weapon-card-quote">
-        <div class="weapon-phone" aria-hidden="true">
-          <span class="weapon-phone-time">9:41</span>
-          <span class="weapon-phone-quote">Rule your mind.</span>
-        </div>
-        <h2>📱 STOIC QUOTE WIDGET</h2>
-        <p>iOS Lock Screen Armor • 24/7 Stoic Quotes</p>
+        <h2>📱 STOIC LOCK SCREEN</h2>
+        <p>Live Stoic Quotes on Your Lock Screen</p>
       </article>
     </div>
 
     <div class="plan-grid">
       <div class="plan-card ${state.selectedPlan === "annual" ? "active" : ""}" data-plan="annual">
-        <span class="plan-badge">MOST POPULAR • 3-DAY FREE TRIAL</span>
+        <span class="plan-badge">BEST VALUE • 3 DAYS FREE</span>
         <div>
-          <div style="font-weight: 800; font-size: 14.5px;">Annual NNN + Winter Arc Pass</div>
-          <div style="font-size: 11.5px; color: var(--text-muted);">3 days free, then $29.99/yr ($0.57/wk)</div>
+          <div style="font-weight: 700; font-size: 14.5px;">Annual Full-Armor Pass</div>
+          <div style="font-size: 11.5px; color: var(--text-muted);">3 days free • $29.99/yr ($0.57/wk)</div>
         </div>
         <div style="text-align: right;">
-          <div style="font-weight: 900; font-size: 18px; color: var(--accent-emerald-bright);">$2.49</div>
+          <div style="font-weight: 800; font-size: 18px; color: var(--accent-emerald-bright);">$2.49</div>
           <div style="font-size: 10.5px; color: var(--text-muted);">/ month</div>
         </div>
       </div>
 
       <div class="plan-card ${state.selectedPlan === "monthly" ? "active" : ""}" data-plan="monthly">
         <div>
-          <div style="font-weight: 800; font-size: 14.5px;">30-Day NNN Survival Pass</div>
-          <div style="font-size: 11.5px; color: var(--text-muted);">Billed monthly • No trial • Cancel anytime</div>
+          <div style="font-weight: 700; font-size: 14.5px;">Monthly Shield Pass</div>
+          <div style="font-size: 11.5px; color: var(--text-muted);">Flexible monthly • Cancel anytime</div>
         </div>
         <div style="text-align: right;">
-          <div style="font-weight: 900; font-size: 18px;">$9.99</div>
+          <div style="font-weight: 800; font-size: 18px;">$9.99</div>
           <div style="font-size: 10.5px; color: var(--text-muted);">/ month</div>
         </div>
       </div>
     </div>
 
     <label class="pact-toggle">
-      <input id="penaltyBumpToggle" type="checkbox" ${state.precheckPenaltyBump ? "checked" : ""} />
-      <span>
-        <strong>🔥 $15 RELAPSE PACT</strong>
-        <em>+310% stick rate</em>
+      <span class="pact-copy">
+        <strong>🔥 $15 HONESTY STAKE</strong>
+        <em>3.1× higher finish rate</em>
+      </span>
+      <span class="ios-switch">
+        <input id="penaltyBumpToggle" type="checkbox" ${state.precheckPenaltyBump ? "checked" : ""} />
+        <span class="ios-switch-track" aria-hidden="true"></span>
       </span>
     </label>
 
-    <button id="openCheckoutSheetBtn" class="btn-primary" type="button">Apple Pay / Stripe Checkout</button>
-    <button type="button" class="btn-trial" data-d1-start-pass>🎁 Try 1 Day Free (24H Full App Access — No Card)</button>
-    <div class="paywall-fine">IA-PERFORMANCE-LABS • Cancel anytime</div>
+    <button id="openCheckoutSheetBtn" class="btn-primary" type="button">Start 3-Day Free Trial →</button>
+    <button id="tryDay1Btn" type="button" class="btn-trial" data-d1-start-pass>Try 24 Hours Free — No Card</button>
+    <div class="paywall-fine">1-Tap Cancel Anytime • 100% Private</div>
   `;
 
   root.querySelectorAll(".plan-card").forEach((card) => {
@@ -832,19 +836,7 @@ function bindHoldOath() {
 }
 
 function renderBlockerTab(root) {
-  const rank = getRank(state.streakDays);
   root.innerHTML = `
-    <div class="streak-rank-bar">
-      <div class="sr-stat">
-        <span>STREAK</span>
-        <strong>DAY ${state.streakDays}</strong>
-      </div>
-      <div id="liveSubClock" class="sr-clock">${formatSubClock(state.streakSecondsOffset)}</div>
-      <div class="sr-stat sr-rank">
-        <span>RANK ${rank.code}</span>
-        <strong>${rank.name}</strong>
-      </div>
-    </div>
     <div id="blockerShieldMount"></div>
   `;
   if (window.BlockerShield) {
@@ -864,7 +856,6 @@ function renderBlockerTab(root) {
 function renderLockQuoteTab(root) {
   const shield = window.BlockerShield ? window.BlockerShield.getState() : { attempts: 0 };
   root.innerHTML = `
-    <h1 class="tab-headline">Lock Screen Armor</h1>
     <div id="lockQuoteMount"></div>
   `;
   if (window.LockScreenWidget) {
@@ -916,17 +907,17 @@ function renderPanicTab(root) {
 
 function renderIphoneTab(root) {
   root.innerHTML = `
-    <h1 class="tab-headline">On Your iPhone</h1>
+    <h1 class="tab-headline">2-Step iPhone Setup</h1>
 
     <section class="install-card">
       <div class="install-step-no">1</div>
-      <h2>Block Porn Today</h2>
-      <button id="installProfileBtn" type="button" class="btn-primary">📲 Install Real iPhone Blocker</button>
+      <h2>Activate URL Shield</h2>
+      <button id="installProfileBtn" type="button" class="btn-primary">📲 Install iOS Shield Profile</button>
     </section>
 
     <section class="install-card">
       <div class="install-step-no">2</div>
-      <h2>Home Screen Icon</h2>
+      <h2>Pin To Home Screen</h2>
       <div class="share-guide" aria-label="Tap Share in Safari, then Add to Home Screen">
         <div class="share-card">
           <span class="share-ico" aria-hidden="true">
@@ -950,8 +941,8 @@ function renderIphoneTab(root) {
 
     <section class="install-card">
       <div class="install-step-no">3</div>
-      <h2>Lock Screen Mode</h2>
-      <button id="openFullLockBtn" type="button" class="btn-trial">📱 Full-Screen iPhone Lock Screen Mode</button>
+      <h2>Stoic Lock Screen</h2>
+      <button id="openFullLockBtn" type="button" class="btn-trial">📱 Launch Full-Screen Lock Mode</button>
     </section>
 
     <section class="install-card">

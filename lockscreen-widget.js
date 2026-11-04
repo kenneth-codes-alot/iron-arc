@@ -8,9 +8,9 @@
  *   LockScreenWidget.nextQuote();
  *   LockScreenWidget.getState();
  *
- * Styles: obsidian | gold | ice | blood
+ * Styles: obsidian (Obsidian) | gold (Spartan) | ice (Glacier) | blood (Crimson)
  * Vibes:  urges | marcus | gym | stoic
- * Rotate: 1h | 3h | night (23:00)
+ * Rotate: 1h | 3h | night (23:00 danger hour)
  */
 (function (root) {
   "use strict";
@@ -23,22 +23,22 @@
 
   var THEMES = {
     obsidian: { id: "obsidian", name: "Obsidian", emoji: "🌑", accent: "#34d399" },
-    gold: { id: "gold", name: "Gold Spartan", emoji: "👑", accent: "#f6c453" },
-    ice: { id: "ice", name: "Ice Glass", emoji: "🧊", accent: "#bae6fd" },
-    blood: { id: "blood", name: "Blood Iron", emoji: "🩸", accent: "#fb7185" }
+    gold: { id: "gold", name: "Spartan", emoji: "👑", accent: "#f6c453" },
+    ice: { id: "ice", name: "Glacier", emoji: "🧊", accent: "#bae6fd" },
+    blood: { id: "blood", name: "Crimson", emoji: "🩸", accent: "#fb7185" }
   };
 
   var VIBES = [
-    { id: "urges", label: "⚔️ Kill Urges" },
+    { id: "urges", label: "⚔️ Kill The Urge" },
     { id: "marcus", label: "🏛️ Marcus Aurelius" },
-    { id: "gym", label: "🏋️‍♂️ Gym Energy" },
+    { id: "gym", label: "🏋️‍♂️ Iron Discipline" },
     { id: "stoic", label: "🗿 Pure Stoic" }
   ];
 
   var ROTATIONS = [
     { id: "1h", label: "Every 1H" },
     { id: "3h", label: "Every 3H" },
-    { id: "night", label: "Late Night (11 PM)" }
+    { id: "night", label: "11 PM Danger Hour" }
   ];
 
   var QUOTES = {
@@ -181,7 +181,11 @@
 
   function blockedLine(n) {
     var c = Math.max(0, n | 0);
-    return "Blocked " + c + " adult URL" + (c === 1 ? "" : "s") + " today";
+    return c + " urge" + (c === 1 ? "" : "s") + " intercepted today";
+  }
+
+  function islandCopy(on) {
+    return on ? "Shield Armed" : "Disarmed";
   }
 
   function ringOffset(day) {
@@ -378,7 +382,7 @@
 
   function screenMarkup(s, mode) {
     var body = s.shieldOn ? blockedLine(s.blockedToday) : "Shield off. URLs exposed";
-    var island = s.shieldOn ? "Shield Active" : "Shield Off";
+    var island = islandCopy(s.shieldOn);
     var islandEmo = s.shieldOn ? "🛡️" : "⚠️";
     var bannerLabel = "🛡️ IRON ARC • " + body;
     var home = mode === "full"
@@ -399,7 +403,7 @@
           '<div class="lsw-clock" data-lsw-clock>' + esc(s.clockLabel) + '</div>' +
           '<div class="lsw-widgets">' +
             '<button type="button" class="lsw-quote" data-lsw-quote data-lsw-hold aria-label="Stoic quote. ' + esc(s.quote.text) + ' ' + esc(s.quote.author) + '">' +
-              '<span class="lsw-kicker">STOIC QUOTE BOX</span>' +
+              '<span class="lsw-kicker">DAILY STOIC</span>' +
               '<span class="lsw-q" data-lsw-q>\u201C' + esc(s.quote.text) + '\u201D</span>' +
               '<span class="lsw-by" data-lsw-by>\u2014 ' + esc(s.quote.author) + '</span>' +
             '</button>' +
@@ -469,9 +473,8 @@
     for (i = 0; i < ids.length; i++) {
       var t = THEMES[ids[i]];
       var on = s.theme === t.id;
-      html += '<button type="button" class="lsw-swatch' + (on ? " is-on" : "") + '" data-lsw-theme="' + t.id + '" role="option" aria-selected="' + (on ? "true" : "false") + '" aria-label="' + esc(t.emoji + " " + t.name) + '">' +
-        '<span class="lsw-mini lsw-skin-' + t.id + '"></span>' +
-        '<span class="lsw-swatch-emo" aria-hidden="true">' + t.emoji + '</span>' +
+      html += '<button type="button" class="lsw-swatch' + (on ? " is-on" : "") + '" data-lsw-theme="' + t.id + '" role="option" aria-selected="' + (on ? "true" : "false") + '" aria-label="' + esc(t.name) + '">' +
+        '<span class="lsw-swatch-dot" aria-hidden="true"></span>' +
         '<span class="lsw-swatch-name">' + esc(t.name) + '</span>' +
       '</button>';
     }
@@ -483,17 +486,17 @@
     var s = compose(override);
     return '' +
       '<section class="lsw-panel" data-lsw-panel>' +
-        '<div class="lsw-stage">' + deviceMarkup(s) + '</div>' +
+        '<div class="lsw-stage lsw-preview-wrap">' + deviceMarkup(s) + '</div>' +
         '<div class="lsw-controls">' +
           swatchMarkup(s) +
           '<div class="lsw-pills lsw-vibes" role="group" aria-label="Quote vibe">' + pills(VIBES, "vibe", s.vibe) + '</div>' +
           '<div class="lsw-actions">' +
-            '<button type="button" class="lsw-act" data-lsw-shuffle>↻ Tap to Shuffle Quote</button>' +
-            '<button type="button" class="lsw-act lsw-act-speak" data-lsw-speak>🔊 Speak Quote</button>' +
+            '<button type="button" class="lsw-act" data-lsw-shuffle>↻ Next Stoic Quote</button>' +
+            '<button type="button" class="lsw-act lsw-act-speak" data-lsw-speak>🔊 Voice Readout</button>' +
           '</div>' +
           '<div class="lsw-pills lsw-rots" role="group" aria-label="Auto rotation">' + pills(ROTATIONS, "rot", s.rotation) + '</div>' +
           '<div class="lsw-eta" data-lsw-eta>↻ ' + esc(s.etaLabel) + '</div>' +
-          '<button type="button" class="lsw-go" data-lsw-full><span>📱 Full-Screen iPhone Lock Screen Mode</span></button>' +
+          '<button type="button" class="lsw-go" data-lsw-full><span>📱 Preview Full Lock Screen</span></button>' +
         '</div>' +
       '</section>';
   }
@@ -506,13 +509,28 @@
     ".lsw-panel button:focus-visible,.lsw-full button:focus-visible{outline:2px solid #fff;outline-offset:2px}",
     ".lsw-stage{display:flex;flex-direction:column;align-items:center;padding:2px 8px 0}",
     ".lsw-stage::after{content:'';width:58%;height:16px;margin-top:-4px;background:radial-gradient(ellipse,rgba(0,0,0,.55),transparent 70%);filter:blur(1px)}",
+    ".lsw-preview-wrap{width:100%;align-items:stretch;padding:0}",
+    ".lsw-preview-wrap::after{display:none}",
     ".lsw-device{position:relative;width:min(340px,96vw);aspect-ratio:402/874;border-radius:46px;background:linear-gradient(145deg,rgba(255,255,255,.7),rgba(255,255,255,0) 22%),linear-gradient(180deg,#a1a1aa 0%,#3f3f46 10%,#18181b 28%,#09090b 52%,#52525b 78%,#18181b 100%);box-shadow:0 28px 70px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.38),inset 0 0 0 2px rgba(0,0,0,.55);flex:none}",
+    ".lsw-preview-wrap .lsw-device{width:100%;max-width:100%;aspect-ratio:auto;height:auto;min-height:310px;padding:0;border-radius:24px;background:none;box-shadow:0 16px 40px rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.12);overflow:hidden}",
+    ".lsw-preview-wrap .lsw-hw,.lsw-preview-wrap .lsw-dock,.lsw-preview-wrap .lsw-home{display:none}",
+    ".lsw-overlay .lsw-device{width:min(440px,100%);height:100%;max-width:100%;aspect-ratio:auto;border-radius:0;background:none;box-shadow:none;flex:0 0 auto;overflow:visible}",
     ".lsw-hw{position:absolute;width:3px;border-radius:2px;background:linear-gradient(#71717a,#18181b);box-shadow:inset 0 1px 0 rgba(255,255,255,.35);z-index:2}",
     ".lsw-hw-action{left:-3px;top:15%;height:22px}",
     ".lsw-hw-vol{left:-3px;top:21%;height:46px}",
     ".lsw-hw-vol2{left:-3px;top:29%;height:46px}",
     ".lsw-hw-power{right:-3px;left:auto;top:24%;height:74px}",
     ".lsw-screen{position:absolute;inset:8px;border-radius:38px;overflow:hidden;background:#000;display:flex;flex-direction:column;padding:10px 12px 8px;container-type:inline-size;color:#fff;--lsw-accent:#34d399}",
+    ".lsw-preview-wrap .lsw-screen{position:relative;inset:auto;width:100%;height:auto;min-height:310px;border-radius:23px;padding:20px 16px 16px}",
+    ".lsw-preview-wrap .lsw-clock{font-size:clamp(84px,28cqw,112px)}",
+    ".lsw-preview-wrap .lsw-date{font-size:clamp(16px,4.6cqw,20px)}",
+    ".lsw-preview-wrap .lsw-widgets{margin-top:14px;gap:10px}",
+    ".lsw-preview-wrap .lsw-quote{height:clamp(128px,36cqw,148px);min-height:128px;padding:14px 14px 14px 16px}",
+    ".lsw-preview-wrap .lsw-q{font-size:clamp(16px,4.6cqw,19px);-webkit-line-clamp:4}",
+    ".lsw-preview-wrap .lsw-kicker{letter-spacing:.14em}",
+    ".lsw-preview-wrap .lsw-streak{width:clamp(128px,36cqw,148px);height:clamp(128px,36cqw,148px)}",
+    ".lsw-preview-wrap .lsw-banner{margin-bottom:0}",
+    ".lsw-preview-wrap .lsw-spacer{min-height:18px}",
     ".lsw-screen[data-theme='gold']{--lsw-accent:#f6c453}",
     ".lsw-screen[data-theme='ice']{--lsw-accent:#bae6fd}",
     ".lsw-screen[data-theme='blood']{--lsw-accent:#fb7185}",
@@ -591,32 +609,36 @@
     ".lsw-shutter i{width:56px;height:56px;border-radius:50%;background:#fff;display:block}",
     ".lsw-shutter:active i{transform:scale(.9);background:#ddd}",
     ".lsw-controls{display:flex;flex-direction:column;gap:10px;padding:0 2px}",
-    ".lsw-swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}",
-    ".lsw-swatch{position:relative;aspect-ratio:3/3.7;border-radius:18px;overflow:hidden;border:2px solid transparent;padding:0;background:#111;color:#fff;box-shadow:0 8px 18px rgba(0,0,0,.28)}",
-    ".lsw-swatch.is-on{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.32),0 12px 24px rgba(0,0,0,.35);transform:translateY(-2px)}",
-    ".lsw-mini{position:absolute;inset:0}",
-    ".lsw-swatch-emo{position:absolute;left:0;right:0;top:18%;text-align:center;font-size:22px;z-index:2;filter:drop-shadow(0 2px 4px rgba(0,0,0,.45))}",
-    ".lsw-swatch-name{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:18px 4px 8px;text-align:center;font-size:10px;font-weight:800;letter-spacing:.01em;line-height:1.15;background:linear-gradient(transparent,rgba(0,0,0,.78))}",
+    ".lsw-swatches{display:flex;flex-direction:row;justify-content:center;align-items:stretch;gap:6px;height:42px;aspect-ratio:auto;padding:0 10px}",
+    ".lsw-swatch{position:relative;flex:1 1 0;min-width:0;height:42px;aspect-ratio:auto;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.14);padding:0 6px;background:rgba(255,255,255,.05);color:#fff;box-shadow:none;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px}",
+    ".lsw-swatch.is-on{border-color:rgba(255,255,255,.92);background:rgba(255,255,255,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);transform:none}",
+    ".lsw-swatch-dot{width:12px;height:12px;border-radius:50%;flex:none}",
+    ".lsw-swatch[data-lsw-theme='obsidian'] .lsw-swatch-dot{background:#34d399;box-shadow:0 0 8px #34d399}",
+    ".lsw-swatch[data-lsw-theme='gold'] .lsw-swatch-dot{background:#f6c453;box-shadow:0 0 8px #f6c453}",
+    ".lsw-swatch[data-lsw-theme='ice'] .lsw-swatch-dot{background:#bae6fd;box-shadow:0 0 8px #bae6fd}",
+    ".lsw-swatch[data-lsw-theme='blood'] .lsw-swatch-dot{background:#fb7185;box-shadow:0 0 8px #fb7185}",
+    ".lsw-swatch-name{position:static;padding:0;background:none;font-size:10px;font-weight:800;letter-spacing:-.03em;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
     ".lsw-pills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}",
     ".lsw-pills::-webkit-scrollbar{display:none}",
     ".lsw-vibes{display:grid;grid-template-columns:1fr 1fr;overflow:visible}",
-    ".lsw-rots{display:grid;grid-template-columns:1fr 1fr 1.25fr;overflow:visible}",
+    ".lsw-rots{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,.9fr) minmax(0,1.5fr);overflow:visible}",
     ".lsw-pill{flex:0 0 auto;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#e2e8f0;font-weight:800;font-size:12px;padding:10px 12px;white-space:nowrap;text-align:center}",
     ".lsw-vibes .lsw-pill,.lsw-rots .lsw-pill{white-space:normal}",
     ".lsw-pill.is-on{background:#f8fafc;color:#0b0d12;border-color:#fff}",
     ".lsw-pill:active,.lsw-swatch:active,.lsw-act:active,.lsw-go:active{transform:scale(.97)}",
-    ".lsw-swatch.is-on:active{transform:translateY(-2px) scale(.97)}",
+    ".lsw-swatch.is-on:active{transform:scale(.97)}",
     ".lsw-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}",
     ".lsw-act{min-height:52px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);color:#f8fafc;font-weight:800;font-size:13px;line-height:1.15;padding:8px 10px}",
     ".lsw-act-speak{background:#f8fafc;color:#111;border-color:#fff}",
     ".lsw-act-speak.is-hot{box-shadow:0 0 0 3px rgba(52,211,153,.45)}",
     ".lsw-eta{text-align:center;font-size:12px;font-weight:800;letter-spacing:.08em;color:#94a3b8}",
-    ".lsw-go{position:relative;overflow:hidden;width:100%;min-height:56px;border:0;border-radius:16px;padding:12px 14px;color:#042f24;font-weight:900;font-size:14px;letter-spacing:-.01em;background:radial-gradient(120% 90% at 8% 0%,rgba(255,255,255,.5),transparent 42%),linear-gradient(180deg,#5eead4 0%,#10b981 58%,#047857 100%);box-shadow:0 12px 28px rgba(16,185,129,.35),inset 0 1px 0 rgba(255,255,255,.65)}",
+    ".lsw-go{position:relative;width:100%;min-height:56px;border:0;border-radius:16px;padding:12px 14px;color:#042f24;font-weight:900;font-size:14px;letter-spacing:-.01em;background:radial-gradient(120% 90% at 8% 0%,rgba(255,255,255,.5),transparent 42%),linear-gradient(180deg,#5eead4 0%,#10b981 58%,#047857 100%);box-shadow:0 12px 28px rgba(16,185,129,.35),inset 0 1px 0 rgba(255,255,255,.65)}",
     ".lsw-go span{position:relative;z-index:1}",
-    ".lsw-go::after{content:'';position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.55) 48%,transparent 62%);transform:translateX(-120%);animation:lsw-sheen 2.8s ease-in-out infinite}",
-    ".lsw-full{position:fixed;inset:0;z-index:9600;display:flex;justify-content:center;background:#000;overscroll-behavior:contain;touch-action:none}",
+    ".lsw-full{position:fixed;inset:0;z-index:9600;display:flex;justify-content:center;background:#000;overscroll-behavior:contain;touch-action:none;overflow:hidden}",
     ".lsw-full-bg{position:absolute;inset:-8%;filter:blur(28px) brightness(.55) saturate(1.15);transform:scale(1.08)}",
-    ".lsw-full .lsw-screen{position:relative;inset:auto;width:min(440px,100%);height:100%;border-radius:0;box-shadow:none;padding:calc(env(safe-area-inset-top,0px) + 12px) 18px calc(env(safe-area-inset-bottom,0px) + 10px);touch-action:none}",
+    ".lsw-full .lsw-screen{position:relative;inset:auto;width:100%;height:100%;border-radius:0;box-shadow:none;padding:calc(env(safe-area-inset-top,0px) + 12px) 18px calc(env(safe-area-inset-bottom,0px) + 10px);touch-action:none}",
+    ".lsw-overlay .lsw-hw-action,.lsw-overlay .lsw-hw-vol,.lsw-overlay .lsw-hw-vol2{left:0}",
+    ".lsw-overlay .lsw-hw-power{right:0;left:auto}",
     ".lsw-full .lsw-island{height:38px;padding:0 12px 0 12px}",
     ".lsw-full .lsw-island-txt{font-size:13px}",
     ".lsw-full .lsw-banner{border-radius:24px;padding:12px 14px}",
@@ -626,10 +648,9 @@
     "@keyframes lsw-pop{0%{transform:scale(.96);filter:brightness(1.45)}100%{transform:none;filter:none}}",
     "@keyframes lsw-bob{0%,100%{transform:rotate(45deg) translateY(3px);opacity:.4}50%{transform:rotate(45deg) translateY(-2px);opacity:1}}",
     "@keyframes lsw-flash{0%{opacity:0}12%{opacity:.95}100%{opacity:0}}",
-    "@keyframes lsw-sheen{0%,58%{transform:translateX(-120%)}100%{transform:translateX(120%)}}",
     "@keyframes lsw-themeflash{0%{filter:brightness(1.35) saturate(1.3)}100%{filter:none}}",
     ".lsw-screen.is-theme{animation:lsw-themeflash .4s ease}",
-    "@media (prefers-reduced-motion:reduce){.lsw-wall,.lsw-dot,.lsw-chev,.lsw-go::after,.lsw-quote.is-pop{animation:none !important}}"
+    "@media (prefers-reduced-motion:reduce){.lsw-wall,.lsw-dot,.lsw-chev,.lsw-quote.is-pop{animation:none !important}}"
   ].join("\n");
 
   function ensureCSS() {
@@ -707,7 +728,7 @@
     var screens = scope.querySelectorAll("[data-lsw-screen]");
     var i;
     var body = s.shieldOn ? blockedLine(s.blockedToday) : "Shield off. URLs exposed";
-    var island = s.shieldOn ? "Shield Active" : "Shield Off";
+    var island = islandCopy(s.shieldOn);
     var islandEmo = s.shieldOn ? "🛡️" : "⚠️";
     var quoted = "\u201C" + s.quote.text + "\u201D";
     var byline = "\u2014 " + s.quote.author;
@@ -1051,13 +1072,20 @@
     closing = false;
     var s = getState();
     fullEl = root.document.createElement("div");
-    fullEl.className = "lsw-full";
+    fullEl.className = "lsw-full lsw-overlay";
     fullEl.id = "lsw-full";
     fullEl.setAttribute("role", "dialog");
     fullEl.setAttribute("aria-modal", "true");
     fullEl.setAttribute("aria-label", "iPhone Lock Screen");
     fullEl.tabIndex = -1;
-    fullEl.innerHTML = '<div class="lsw-full-bg lsw-skin-' + s.theme + '" data-lsw-bg></div>' + screenMarkup(s, "full");
+    fullEl.innerHTML = '<div class="lsw-full-bg lsw-skin-' + s.theme + '" data-lsw-bg></div>' +
+      '<div class="lsw-device">' +
+        '<span class="lsw-hw lsw-hw-action" aria-hidden="true"></span>' +
+        '<span class="lsw-hw lsw-hw-vol" aria-hidden="true"></span>' +
+        '<span class="lsw-hw lsw-hw-vol2" aria-hidden="true"></span>' +
+        '<span class="lsw-hw lsw-hw-power" aria-hidden="true"></span>' +
+        screenMarkup(s, "full") +
+      '</div>';
     root.document.body.appendChild(fullEl);
     bindRoot(fullEl);
     bindGestures(fullEl.querySelector("[data-lsw-screen]"), true);
