@@ -811,6 +811,33 @@
       "</div>";
   }
 
+  function rewireTargetMarkup(diagnosis) {
+    if (!diagnosis || !diagnosis.rewire) return "";
+    var targetLabel = diagnosis.rewire.fullRewireTargetLabel || "90-Day Target";
+    var days = diagnosis.rewire.days || 90;
+    var pillars = diagnosis.pillars || [];
+    var weakest = pillars.slice().sort(function (a, b) { return b.load - a.load; })[0];
+    var weakAxis = weakest ? (COMBAT_AXES[weakest.id] || { icon: "⚠️", name: weakest.label }) : null;
+    var weakText = weakest && weakAxis ? (weakAxis.icon + " " + weakAxis.name + " (" + weakest.load + "% Load)") : "Impulse Control";
+    var triggerText = (diagnosis.profile && diagnosis.profile.trigger) ? diagnosis.profile.trigger : "Late night in bed";
+    return '<div class="fm-rewire-card">' +
+      '<div class="fm-rewire-head">' +
+        '<div><span class="fm-rewire-kicker">🎯 FULL REWIRE TARGET DATE</span>' +
+        '<strong class="fm-rewire-date">' + escapeHtml(targetLabel) + '</strong></div>' +
+        '<span class="fm-rewire-pill">' + escapeHtml(String(days)) + '-DAY ARC</span>' +
+      '</div>' +
+      '<div class="fm-rewire-meta">' +
+        '<span><b>Weakest Pillar:</b> ' + escapeHtml(weakText) + '</span>' +
+        '<span><b>Danger Window:</b> ' + escapeHtml(triggerText) + '</span>' +
+      '</div>' +
+      '<div class="fm-rewire-milestones">' +
+        '<span><b>Day 7</b> +45% Drive</span>' +
+        '<span><b>Day 14</b> Brake Thickens</span>' +
+        '<span><b>Day 30</b> NNN Mastery</span>' +
+      '</div>' +
+    '</div>';
+  }
+
   function renderDiagnosisHTML(diagnosis) {
     if (!diagnosis) return "";
     var base = diagnosis.healthyBaseline || HEALTHY_BASELINE;
@@ -822,7 +849,7 @@
         "</li>";
     }).join("");
     return '<section class="fm-diagnosis fm-battle" data-band="' + escapeHtml(diagnosis.band) + '">' +
-      '<p class="fm-kicker">BASELINE READOUT</p>' +
+      '<p class="fm-kicker">BASELINE READOUT • ' + escapeHtml(diagnosis.multiplierLabel || "4.0×") + ' ABOVE BASELINE</p>' +
       "<h2>BATTLE RADAR</h2>" +
       '<div class="fm-gauges">' +
         gaugeMarkup(diagnosis.dependencyScore, "load", "DOPAMINE TAX") +
@@ -831,6 +858,7 @@
       "</div>" +
       radarMarkup(diagnosis.pillars || []) +
       '<ul class="fm-pillars">' + pillarRows + "</ul>" +
+      rewireTargetMarkup(diagnosis) +
       weaponsMarkup() +
       '<p class="fm-disclaimer">Self-report score, not a medical diagnosis.</p></section>';
   }
@@ -1652,7 +1680,17 @@
     ".fm-battle .fm-track{height:12px;background:rgba(255,255,255,.08);overflow:visible}",
     ".fm-pillars small,.fm-disclaimer,.fm-note{color:var(--text-dim,#64748b);font-size:12px;line-height:1.4}",
     ".fm-battle .fm-disclaimer{margin:10px 0 2px;text-align:center}",
-    ".fm-weapons{display:grid;gap:8px;margin:14px 0 0}",
+    ".fm-weapons{display:grid;gap:8px;margin:12px 0 0}",
+    ".fm-rewire-card{margin:12px 0 0;padding:12px;border-radius:14px;background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(15,23,42,.9));border:1px solid rgba(16,185,129,.35)}",
+    ".fm-rewire-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}",
+    ".fm-rewire-kicker{display:block;font-size:10px;font-weight:800;letter-spacing:.1em;color:#34d399}",
+    ".fm-rewire-date{display:block;font-size:16px;font-weight:900;color:#f8fafc;letter-spacing:-.01em;margin-top:1px}",
+    ".fm-rewire-pill{font-size:10px;font-weight:900;letter-spacing:.08em;padding:4px 8px;border-radius:999px;background:rgba(16,185,129,.2);color:#6ee7b7;border:1px solid rgba(16,185,129,.4);white-space:nowrap}",
+    ".fm-rewire-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:7px 9px;border-radius:10px;background:rgba(0,0,0,.28);font-size:11px;color:#cbd5e1;margin-bottom:8px}",
+    ".fm-rewire-meta b{color:#94a3b8;font-weight:700;display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em}",
+    ".fm-rewire-milestones{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;font-size:10.5px;color:#e2e8f0;text-align:center}",
+    ".fm-rewire-milestones span{padding:5px 4px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07)}",
+    ".fm-rewire-milestones b{display:block;color:#34d399;font-size:10px;letter-spacing:.04em;text-transform:uppercase}",
     ".fm-weapon{display:flex;gap:10px;align-items:center;padding:12px;border-radius:14px;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08)}",
     ".fm-weapon-ico{font-size:18px;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none;line-height:1;background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.07)}",
     ".fm-weapon-copy{display:flex;flex-direction:column;gap:1px;min-width:0}",

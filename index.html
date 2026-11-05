@@ -7,15 +7,28 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="IRON ARC" />
   <title>IRON ARC — NNN &amp; 90-Day Dopamine Reboot Protocol</title>
-  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="manifest" href="./manifest.webmanifest?v=4" />
   <meta name="theme-color" content="#05070a" />
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles.css?v=4" />
   <script>
     (function () {
       try {
-        var prod = new URLSearchParams(location.search).get("mode") === "prod";
+        var params = new URLSearchParams(location.search);
+        var prod = params.get("mode") === "prod";
+        var standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
         var mobile = window.matchMedia("(max-width: 520px)").matches;
-        if (prod || mobile) document.documentElement.classList.add("studio-dock");
+        if (prod || standalone) {
+          document.documentElement.classList.add("is-prod");
+        } else if (mobile) {
+          document.documentElement.classList.add("studio-dock");
+        }
+        if (window.caches && typeof window.caches.keys === "function") {
+          window.caches.keys().then(function (keys) {
+            keys.forEach(function (k) {
+              if (k !== "iron-arc-v4") window.caches.delete(k);
+            });
+          });
+        }
       } catch (e) {}
     })();
   </script>
@@ -139,14 +152,14 @@
   <!-- Modal Root (Downsell & Partner GTM / Stripe Config) -->
   <div id="modalRoot"></div>
 
-  <script src="./dopamine-fx.js"></script>
-  <script src="./funnel-module.js"></script>
-  <script src="./features-module.js"></script>
-  <script src="./day1-onboarding.js"></script>
-  <script src="./live-app-telemetry.js"></script>
-  <script src="./panic2-engine.js"></script>
-  <script src="./blocker-shield.js"></script>
-  <script src="./lockscreen-widget.js"></script>
-  <script src="./app.js"></script>
+  <script src="./dopamine-fx.js?v=4"></script>
+  <script src="./funnel-module.js?v=4"></script>
+  <script src="./features-module.js?v=4"></script>
+  <script src="./day1-onboarding.js?v=4"></script>
+  <script src="./live-app-telemetry.js?v=4"></script>
+  <script src="./panic2-engine.js?v=4"></script>
+  <script src="./blocker-shield.js?v=4"></script>
+  <script src="./lockscreen-widget.js?v=4"></script>
+  <script src="./app.js?v=4"></script>
 </body>
 </html>

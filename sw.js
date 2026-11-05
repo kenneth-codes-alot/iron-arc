@@ -1,4 +1,4 @@
-const CACHE_NAME = "iron-arc-v3";
+const CACHE_NAME = "iron-arc-v4";
 let pendingProfile = "";
 
 self.addEventListener("install", () => {

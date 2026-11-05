@@ -70,6 +70,7 @@ body {
   backdrop-filter: blur(12px);
 }
 
+html.is-prod .studio-bar,
 .studio-bar.hidden-studio {
   display: none !important;
 }
@@ -1554,6 +1555,100 @@ html.studio-dock .studio-bar.is-open .studio-toggle {
   font-weight: 700;
 }
 
+.paywall-diag-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 11px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(244, 63, 94, 0.14), rgba(16, 185, 129, 0.12));
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.paywall-diag-tax {
+  color: #fda4af;
+  letter-spacing: 0.04em;
+}
+
+.paywall-diag-target {
+  color: #6ee7b7;
+  letter-spacing: 0.03em;
+}
+
+.trial-timeline {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 0 0 10px;
+  padding: 9px 8px;
+  border-radius: 13px;
+  background: rgba(16, 185, 129, 0.07);
+  border: 1px solid rgba(16, 185, 129, 0.26);
+}
+
+.tt-step {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+  padding: 2px 3px;
+}
+
+.tt-step strong {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-emerald-bright);
+}
+
+.tt-step b {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+.tt-step small {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.downsell-loss-box {
+  background: rgba(244, 63, 94, 0.09);
+  border: 1px solid rgba(244, 63, 94, 0.32);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #e2e8f0;
+}
+
+.downsell-loss-box strong {
+  display: block;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fda4af;
+  margin-bottom: 5px;
+}
+
+.downsell-loss-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11.5px;
+  color: #cbd5e1;
+}
+
 /* Desktop preview keeps the iPhone 16 Pro bezel, fake status bar, and home indicator. */
 @media (min-width: 521px) {
   .phone-shell {
@@ -1641,7 +1736,7 @@ html.studio-dock .studio-bar.is-open .studio-toggle {
     padding-left: env(safe-area-inset-left, 0px);
   }
 
-  html.studio-dock .phone-shell {
+  html.studio-dock:not(.is-prod) .phone-shell {
     padding-top: calc(env(safe-area-inset-top, 0px) + 30px);
   }
 

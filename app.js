@@ -11,6 +11,7 @@ const RANKS = [
 ];
 
 const SAVED_STRIPE_KEY = "ironarc.stripeLinks.v1";
+const PRO_UNLOCKED_KEY = "ironarc.proUnlocked.v1";
 
 const funnelSession = window.FunnelModule ? window.FunnelModule.createSession() : null;
 
@@ -23,14 +24,14 @@ if (funnelSession && window.FunnelModule) {
   window.FunnelModule.setAnswer(funnelSession, "symptoms", ["fog", "energy", "presence"]);
   window.FunnelModule.setAnswer(funnelSession, "trigger", "night");
   window.FunnelModule.setAnswer(funnelSession, "attempts", "week1");
-  window.FunnelModule.setAnswer(funnelSession, "pact", "Ready");
+  window.FunnelModule.setAnswer(funnelSession, "pact", "sign");
   funnelSession.stepIndex = 0;
 }
 
 const state = {
   screen: "quiz", // quiz | loader | diagnosis | paywall | app
   selectedPlan: "annual",
-  precheckPenaltyBump: true,
+  precheckPenaltyBump: false,
   activeTab: "blocker", // blocker | lockquote | battle | panic | iphone
   panicLaunch: false,
   streakDays: 14,
@@ -48,6 +49,20 @@ const state = {
     { name: "Devon_Lift", days: 2, status: "fallen", note: "Folded Nov 4 • $15 Penalty Ledgered • In Redemption" }
   ]
 };
+
+function markProUnlocked() {
+  try {
+    localStorage.setItem(PRO_UNLOCKED_KEY, "1");
+  } catch (_) {}
+}
+
+function isProUnlocked() {
+  try {
+    return localStorage.getItem(PRO_UNLOCKED_KEY) === "1";
+  } catch (_) {
+    return false;
+  }
+}
 
 // Load saved Stripe Payment Links from localStorage if configured
 function loadSavedStripeConfig() {
@@ -512,13 +527,25 @@ function renderLoader(root) {
 /* =========================================================================
    3. 4-PILLAR SYMPTOM RADAR & DOPAMINE DEPENDENCY DIAGNOSIS
    ========================================================================= */
+function formatShortTargetDate(diagnosis) {
+  if (!diagnosis || !diagnosis.rewire || !diagnosis.rewire.fullRewireTargetDate) return "90-Day Target";
+  try {
+    const parts = diagnosis.rewire.fullRewireTargetDate.split("-");
+    const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" }).format(d);
+  } catch (_) {
+    return diagnosis.rewire.fullRewireTargetLabel || "90-Day Target";
+  }
+}
+
 function renderDiagnosis(root) {
   const diagnosis = window.FunnelModule.buildDiagnosis(funnelSession);
   const diagHTML = window.FunnelModule.renderDiagnosisHTML(diagnosis);
+  const shortDate = formatShortTargetDate(diagnosis);
 
   root.innerHTML = `
     ${diagHTML}
-    <button id="toPaywallBtn" class="btn-primary diagnosis-cta" type="button">Arm My 2 Weapons →</button>
+    <button id="toPaywallBtn" class="btn-primary diagnosis-cta" type="button">Arm My 2 Weapons • Lock ${shortDate} →</button>
   `;
 
   document.getElementById("toPaywallBtn").addEventListener("click", () => {
@@ -531,13 +558,45 @@ function renderDiagnosis(root) {
 /* =========================================================================
    4. HARD PAYWALL + ORDER BUMP + STRIPE / APPLE PAY SHEET
    ========================================================================= */
+function getPaywallCtaCopy(planId, bumpChecked) {
+  if (planId === "annual") {
+    if (bumpChecked) {
+      return {
+        btn: "Start 3-Day Trial + Lock $15 Stake →",
+        fine: "$0.00 plan trial + $15.00 Honesty Stake today • Discrete statement • 1-Tap Cancel"
+      };
+    }
+    return {
+      btn: "Start 3-Day Free Trial ($0.00 Today) →",
+      fine: "$0.00 due today • Cancel in 1 tap • Discrete billing on statement"
+    };
+  }
+  if (bumpChecked) {
+    return {
+      btn: "Arm 30-Day Pass + $15 Stake ($24.99) →",
+      fine: "$9.99/mo pass + $15.00 Honesty Stake today • Discrete billing"
+    };
+  }
+  return {
+    btn: "Arm 30-Day Shield Pass ($9.99 Today) →",
+    fine: "$9.99 due today • Flexible monthly • Discrete billing on statement"
+  };
+}
+
 function renderPaywall(root) {
   const diagnosis = window.FunnelModule.buildDiagnosis(funnelSession);
+  const shortDate = formatShortTargetDate(diagnosis);
+  const ctaCopy = getPaywallCtaCopy(state.selectedPlan, state.precheckPenaltyBump);
 
   root.innerHTML = `
     <div class="paywall-header">
       <span class="quiz-step-tag" style="margin:0;">IRON ARC • PRO</span>
       <button id="paywallCloseBtn" class="paywall-close" title="Triggers 50% Exit-Intent Offer">✕</button>
+    </div>
+
+    <div class="paywall-diag-banner">
+      <span class="paywall-diag-tax">⚠️ ${diagnosis.dependencyScore}% DOPAMINE TAX</span>
+      <span class="paywall-diag-target">🎯 REWIRE: ${shortDate.toUpperCase()}</span>
     </div>
 
     <h1 class="tab-headline">Guard Your Eyes. Rule Your Mind.</h1>
@@ -577,10 +636,34 @@ function renderPaywall(root) {
       </div>
     </div>
 
+    ${
+      state.selectedPlan === "annual"
+        ? `
+    <div class="trial-timeline" aria-label="3-Day Free Trial Timeline">
+      <div class="tt-step">
+        <strong>TODAY</strong>
+        <b>Instant Unlock</b>
+        <small>$0.00 charged</small>
+      </div>
+      <div class="tt-step">
+        <strong>DAY 2</strong>
+        <b>Trial Reminder</b>
+        <small>1-tap cancel</small>
+      </div>
+      <div class="tt-step">
+        <strong>DAY 3</strong>
+        <b>Full Year Arc</b>
+        <small>$0.57 / week</small>
+      </div>
+    </div>
+    `
+        : ""
+    }
+
     <label class="pact-toggle">
       <span class="pact-copy">
-        <strong>🔥 $15 HONESTY STAKE</strong>
-        <em>3.1× higher finish rate</em>
+        <strong>🔥 ADD $15 HONESTY STAKE (OPTIONAL)</strong>
+        <em>3.1× higher 30-day finish rate • Skin in the game</em>
       </span>
       <span class="ios-switch">
         <input id="penaltyBumpToggle" type="checkbox" ${state.precheckPenaltyBump ? "checked" : ""} />
@@ -588,9 +671,9 @@ function renderPaywall(root) {
       </span>
     </label>
 
-    <button id="openCheckoutSheetBtn" class="btn-primary" type="button">Start 3-Day Free Trial →</button>
+    <button id="openCheckoutSheetBtn" class="btn-primary" type="button">${ctaCopy.btn}</button>
+    <div id="paywallFineText" class="paywall-fine">${ctaCopy.fine}</div>
     <button id="tryDay1Btn" type="button" class="btn-trial" data-d1-start-pass>Try 24 Hours Free — No Card</button>
-    <div class="paywall-fine">1-Tap Cancel Anytime • 100% Private</div>
   `;
 
   root.querySelectorAll(".plan-card").forEach((card) => {
@@ -606,25 +689,36 @@ function renderPaywall(root) {
     bumpToggle.addEventListener("change", (e) => {
       if (window.DopamineFX) window.DopamineFX.playTick(720, 0.04);
       state.precheckPenaltyBump = e.target.checked;
+      const nextCopy = getPaywallCtaCopy(state.selectedPlan, state.precheckPenaltyBump);
+      const ctaBtn = document.getElementById("openCheckoutSheetBtn");
+      const fineEl = document.getElementById("paywallFineText");
+      if (ctaBtn) ctaBtn.textContent = nextCopy.btn;
+      if (fineEl) fineEl.textContent = nextCopy.fine;
     });
   }
 
   document.getElementById("openCheckoutSheetBtn").addEventListener("click", () => {
     if (window.DopamineFX) window.DopamineFX.playTick(840, 0.05);
+    const initialBumps = state.precheckPenaltyBump ? ["penaltyStake"] : [];
     window.FunnelModule.startCheckout({
       planId: state.selectedPlan,
-      bumpIds: state.precheckPenaltyBump ? ["penaltyStake"] : [],
+      bumpIds: initialBumps,
       diagnosis,
-      onSuccess() {
+      onSuccess(result) {
         if (window.DopamineFX) {
           window.DopamineFX.playOathSealed();
           window.DopamineFX.burstParticles({ mode: "rank" });
         }
+        markProUnlocked();
         if (window.Day1Module) window.Day1Module.markUpgraded();
         state.willpowerXP += 100;
         state.activeTab = "blocker";
         state.screen = "app";
         render();
+        const usedBumps = (result && result.bumpIds) || initialBumps;
+        if (usedBumps.indexOf("penaltyStake") === -1) {
+          openPostCheckoutStakeUpsell(diagnosis);
+        }
       }
     });
   });
@@ -643,33 +737,45 @@ function renderPaywall(root) {
 }
 
 /* =========================================================================
-   5. 50% OFF EXIT-INTENT DOWNSELL MODAL (QUITTR $19.99/$14.99 RECOVERY)
+   5. 50% OFF EXIT-INTENT DOWNSELL MODAL & POST-CHECKOUT STAKE UPSELL
    ========================================================================= */
 function openDownsellModal() {
   const modalRoot = document.getElementById("modalRoot");
   const diagnosis = window.FunnelModule.buildDiagnosis(funnelSession);
+  const triggerWindow = (diagnosis.profile && diagnosis.profile.trigger) || "Late night in bed";
+  const targetLabel = (diagnosis.rewire && diagnosis.rewire.fullRewireTargetLabel) || "90-Day Rewire Target";
 
   modalRoot.innerHTML = `
     <div class="modal-overlay">
       <div class="modal-card" style="border-color: var(--accent-amber);">
         <div class="season-pill" style="display:inline-block; margin-bottom: 10px;">ONE-TIME FOUNDER COMMITMENT OFFER</div>
-        <h2 style="font-size: 21px; font-weight: 900; margin-bottom: 8px;">Wait — Don't Face the 11 PM Urge Unarmed.</h2>
-        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.45; margin-bottom: 14px;">
-          With a <strong>${diagnosis.dependencyScore}% Dopamine Dependency Score</strong>, trying to white-knuckle November solo has an 84% relapse rate before Day 8. Claim our <strong>50% OFF Commitment Scholarship</strong>:
+        <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 8px; line-height: 1.2;">Wait — Don't Leave Your ${triggerWindow} Window Unarmed.</h2>
+        <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.45; margin-bottom: 10px;">
+          At a <strong>${diagnosis.dependencyScore}% Dopamine Dependency Score</strong>, white-knuckling solo has an 84% relapse rate before Day 8.
         </p>
-        <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 12px; padding: 13px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+
+        <div class="downsell-loss-box">
+          <strong>⚠️ What You Lose If You Leave Now:</strong>
+          <ul class="downsell-loss-list">
+            <li>✕ <strong>${targetLabel}</strong> Full Rewire Protocol reset</li>
+            <li>✕ <strong>42,850+ Adult URLs</strong> left unblocked in Safari tonight</li>
+            <li>✕ <strong>Signed Pact (${state.callsign})</strong> &amp; Lock Screen Shield</li>
+          </ul>
+        </div>
+
+        <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 12px; padding: 12px 13px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <div style="font-weight: 800; font-size: 14px;">Full Year Access (NNN + Winter Arc)</div>
-            <div style="font-size: 11.5px; color: #fbbf24;">Immediate unlock • $0.04 / day</div>
+            <div style="font-weight: 800; font-size: 14px;">Founder Year — 50% Scholarship</div>
+            <div style="font-size: 11.5px; color: #fbbf24;">Full 365-Day Armor • $0.04 / day</div>
           </div>
           <div style="text-align: right;">
             <span style="text-decoration: line-through; color: var(--text-dim); font-size: 12px;">$29.99</span>
             <div style="font-size: 20px; font-weight: 900; color: #fbbf24;">$14.99/yr</div>
           </div>
         </div>
-        <button id="claimDownsellBtn" class="btn-primary" style="margin-bottom: 10px;">Claim 50% OFF ($14.99/yr) →</button>
-        <button id="skipToAppBtn" style="width:100%; background:none; border:none; color: var(--text-dim); font-size: 12px; cursor:pointer; padding: 6px;">
-          Preview Dashboard in Limited Mode
+        <button id="claimDownsellBtn" class="btn-primary" style="margin-bottom: 8px;">Claim 50% OFF ($14.99/yr) →</button>
+        <button id="skipToAppBtn" style="width:100%; background:none; border:none; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor:pointer; padding: 6px;">
+          Or Start 24-Hour Emergency Pass ($0 Today • No Card) →
         </button>
       </div>
     </div>
@@ -681,23 +787,79 @@ function openDownsellModal() {
       planId: "downsell",
       bumpIds: [],
       diagnosis,
-      onSuccess() {
+      onSuccess(result) {
         if (window.DopamineFX) {
           window.DopamineFX.playOathSealed();
           window.DopamineFX.burstParticles({ mode: "seal" });
         }
+        markProUnlocked();
         if (window.Day1Module) window.Day1Module.markUpgraded();
         state.activeTab = "blocker";
         state.screen = "app";
         render();
+        const usedBumps = (result && result.bumpIds) || [];
+        if (usedBumps.indexOf("penaltyStake") === -1) {
+          openPostCheckoutStakeUpsell(diagnosis);
+        }
       }
     });
   });
 
   document.getElementById("skipToAppBtn").addEventListener("click", () => {
     modalRoot.innerHTML = "";
-    state.screen = "app";
-    render();
+    enterDay1Pass();
+  });
+}
+
+function openPostCheckoutStakeUpsell(diagnosis) {
+  const modalRoot = document.getElementById("modalRoot");
+  if (!modalRoot) return;
+  const offer = window.FunnelModule ? window.FunnelModule.getUpsellOffer([]) : null;
+  if (!offer) return;
+
+  modalRoot.innerHTML = `
+    <div class="modal-overlay">
+      <div class="modal-card" style="border-color: var(--accent-emerald);">
+        <div class="season-pill" style="display:inline-block; margin-bottom: 10px;">✓ PROTOCOL UNLOCKED • ONE-TIME OATH UPGRADE</div>
+        <h2 style="font-size: 20px; font-weight: 900; margin-bottom: 8px; line-height: 1.2;">Make Relapsing Impossible Tonight.</h2>
+        <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.45; margin-bottom: 12px;">
+          Your Porn URL Shield &amp; Stoic Lock Screen are armed. Challengers who add the <strong>$15 Skin-in-the-Game Honesty Stake</strong> finish their first 30 days at <strong>3.1× the rate</strong> of willpower alone.
+        </p>
+        <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 12px; padding: 12px 13px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-weight: 800; font-size: 14px;">🔥 $15 Relapse Penalty Pact</div>
+            <div style="font-size: 11.5px; color: var(--accent-emerald-bright);">One-time commitment stake • Zero recurring fee</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 20px; font-weight: 900; color: var(--accent-emerald-bright);">$15</div>
+            <span style="color: var(--text-dim); font-size: 10.5px;">once</span>
+          </div>
+        </div>
+        <button id="acceptStakeUpsellBtn" class="btn-primary" style="margin-bottom: 8px;">Lock My $15 Honesty Stake (+150 XP) →</button>
+        <button id="declineStakeUpsellBtn" style="width:100%; background:none; border:none; color: var(--text-dim); font-size: 12px; font-weight: 700; cursor:pointer; padding: 6px;">
+          Skip Stake &amp; Enter My Shield Dashboard →
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("acceptStakeUpsellBtn").addEventListener("click", () => {
+    modalRoot.innerHTML = "";
+    const stakeUrl = window.FunnelModule.resolveStripeUrl("penaltyStake");
+    if (stakeUrl) {
+      window.location.assign(stakeUrl);
+      return;
+    }
+    state.willpowerXP += 150;
+    if (window.DopamineFX) {
+      window.DopamineFX.playOathSealed();
+      window.DopamineFX.burstParticles({ mode: "rank" });
+    }
+    updateXPPill();
+  });
+
+  document.getElementById("declineStakeUpsellBtn").addEventListener("click", () => {
+    modalRoot.innerHTML = "";
   });
 }
 
@@ -750,11 +912,13 @@ function upgradeFromDay1() {
     return;
   }
   const diagnosis = window.FunnelModule.buildDiagnosis(funnelSession);
+  const initialBumps = state.precheckPenaltyBump ? ["penaltyStake"] : [];
   window.FunnelModule.startCheckout({
     planId: state.selectedPlan || "annual",
-    bumpIds: state.precheckPenaltyBump ? ["penaltyStake"] : [],
+    bumpIds: initialBumps,
     diagnosis,
-    onSuccess() {
+    onSuccess(result) {
+      markProUnlocked();
       if (window.Day1Module) window.Day1Module.markUpgraded();
       if (window.DopamineFX) {
         window.DopamineFX.playOathSealed();
@@ -764,6 +928,10 @@ function upgradeFromDay1() {
       state.screen = "app";
       state.activeTab = "blocker";
       render();
+      const usedBumps = (result && result.bumpIds) || initialBumps;
+      if (usedBumps.indexOf("penaltyStake") === -1) {
+        openPostCheckoutStakeUpsell(diagnosis);
+      }
     }
   });
 }
@@ -1258,17 +1426,26 @@ document.addEventListener("live-telemetry:pulse", (event) => {
   state.lastPulse = detail;
 });
 
-// Compact studio chrome on a real phone and on the customer link (?mode=prod).
+// Hide Studio completely on customer link (?mode=prod) or standalone PWA;
+// keep compact Studio dock on mobile preview when ?mode=prod is not set.
 (function setupStudioDock() {
   const bar = document.getElementById("studioBar");
   const toggle = document.getElementById("studioToggle");
   if (!bar || !toggle) return;
   const params = new URLSearchParams(window.location.search);
-  const prod = params.get("mode") === "prod";
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  const prod = params.get("mode") === "prod" || standalone;
   const mq = window.matchMedia("(max-width: 520px)");
 
+  if (prod) {
+    document.documentElement.classList.add("is-prod");
+    document.documentElement.classList.remove("studio-dock");
+    bar.classList.add("hidden-studio");
+    return;
+  }
+
   function syncDock() {
-    const dock = prod || mq.matches;
+    const dock = mq.matches;
     document.documentElement.classList.toggle("studio-dock", dock);
     if (!dock) {
       bar.classList.remove("is-open");
@@ -1294,15 +1471,39 @@ loadSavedStripeConfig();
 if (window.FunnelModule) {
   const resumed = window.FunnelModule.resumeCheckout({
     mount: document.body,
-    onSuccess() {
+    onSuccess(pending) {
+      markProUnlocked();
+      if (window.Day1Module) window.Day1Module.markUpgraded();
       state.screen = "app";
       render();
+      const usedBumps = (pending && pending.bumpIds) || [];
+      if (usedBumps.indexOf("penaltyStake") === -1) {
+        openPostCheckoutStakeUpsell(window.FunnelModule.buildDiagnosis(funnelSession));
+      }
     }
   });
   if (resumed && resumed.status === "success") {
+    markProUnlocked();
+    if (window.Day1Module) window.Day1Module.markUpgraded();
     state.screen = "app";
   }
 }
+
+// On customer ?mode=prod or standalone Home Screen launch, route returning unlocked
+// or active Day-1 Pass users straight into their Shield dashboard.
+(function restoreCustomerSession() {
+  const params = new URLSearchParams(window.location.search);
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  if (params.get("mode") !== "prod" && !standalone) return;
+  if (isProUnlocked()) {
+    state.screen = "app";
+    return;
+  }
+  const snap = trialSnapshot();
+  if (snap && snap.active) {
+    state.screen = "app";
+  }
+})();
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").catch(() => {});
