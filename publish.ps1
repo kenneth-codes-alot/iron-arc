@@ -171,31 +171,16 @@ self.addEventListener("fetch", function (event) {
 }
 
 function Get-GitHubToken {
-  $env:GIT_TERMINAL_PROMPT = "0"
-  $env:GCM_INTERACTIVE = "Never"
-  $psi = New-Object System.Diagnostics.ProcessStartInfo
-  $psi.FileName = "git"
-  $psi.Arguments = "credential fill"
-  $psi.UseShellExecute = $false
-  $psi.RedirectStandardInput = $true
-  $psi.RedirectStandardOutput = $true
-  $psi.RedirectStandardError = $true
-  $psi.CreateNoWindow = $true
-  $process = New-Object System.Diagnostics.Process
-  $process.StartInfo = $psi
-  [void]$process.Start()
-  $process.StandardInput.Write("protocol=https`nhost=github.com`n`n")
-  $process.StandardInput.Close()
-  $stdout = $process.StandardOutput.ReadToEnd()
-  [void]$process.StandardError.ReadToEnd()
-  $process.WaitForExit()
-  if ($process.ExitCode -ne 0) {
+  # Piping into `git credential fill` matches the helper that already stored
+  # the GitHub login. A redirected ProcessStartInfo call does not.
+  $lines = @("protocol=https`nhost=github.com`n`n" | & git credential fill)
+  if ($LASTEXITCODE -ne 0) {
     throw "git credential fill failed. Sign in with Git Credential Manager and run publish again."
   }
   $token = ""
-  foreach ($line in ($stdout -split "`r?`n")) {
-    if ($line.StartsWith("password=")) {
-      $token = $line.Substring(9).Trim()
+  foreach ($line in $lines) {
+    if ([string]$line -like "password=*") {
+      $token = ([string]$line).Substring(9).Trim()
     }
   }
   if (-not $token) { throw "git credential-manager did not return a GitHub token." }
@@ -229,11 +214,19 @@ function Update-GitHubPagesSource {
   }
 
   $method = $(if ($exists) { "Put" } else { "Post" })
-  $updated = Invoke-RestMethod -Method $method -Uri $uri -Headers $headers -Body $body -ContentType "application/json; charset=utf-8"
-  $branch = $updated.source.branch
-  $path = $updated.source.path
+  Invoke-RestMethod -Method $method -Uri $uri -Headers $headers -Body $body -ContentType "application/json; charset=utf-8" | Out-Null
+  $confirmed = Invoke-RestMethod -Method Get -Uri $uri -Headers $headers
+  $branch = [string]$confirmed.source.branch
+  $path = [string]$confirmed.source.path
   if ($branch -ne "gh-pages" -or $path -ne "/") {
     throw "GitHub Pages did not switch to gh-pages / (got $branch $path)"
+  }
+  try {
+    Invoke-RestMethod -Method Post -Uri ($uri + "/builds") -Headers $headers | Out-Null
+  } catch {
+    $buildStatus = 0
+    if ($_.Exception.Response) { $buildStatus = [int]$_.Exception.Response.StatusCode }
+    if ($buildStatus -ne 409) { throw }
   }
   Write-Host "GitHub Pages source is gh-pages ($path)."
 }
