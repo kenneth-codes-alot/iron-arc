@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="robots" content="noindex, nofollow" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="IRON ARC" />
+  <title>IRON ARC — NNN &amp; 90-Day Dopamine Reboot Protocol</title>
+  <link rel="manifest" href="./manifest.webmanifest?v=5" />
+  <meta name="theme-color" content="#05070a" />
+  <link rel="stylesheet" href="./styles.css?v=5" />
+  <script>
+    (function () {
+      try {
+        var params = new URLSearchParams(location.search);
+        var prod = params.get("mode") === "prod";
+        var standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+        var mobile = window.matchMedia("(max-width: 520px)").matches;
+        if (prod || standalone) {
+          document.documentElement.classList.add("is-prod");
+        } else if (mobile) {
+          document.documentElement.classList.add("studio-dock");
+        }
+        if (window.caches && typeof window.caches.keys === "function") {
+          window.caches.keys().then(function (keys) {
+            keys.forEach(function (k) {
+              if (k !== "iron-arc-v5") window.caches.delete(k);
+            });
+          });
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <!-- Founder studio tools. Compact/collapsible on a real phone and on ?mode=prod. -->
+  <div id="studioBar" class="studio-bar">
+    <button type="button" id="studioToggle" class="studio-toggle" aria-expanded="false" aria-controls="studioTools">Studio</button>
+    <div id="studioTools" class="studio-tools">
+    <span class="studio-label">GTM Studio:</span>
+    <button class="studio-btn" data-jump="quiz">1. Quiz</button>
+    <button class="studio-btn" data-jump="radar">2. Battle Radar</button>
+    <button class="studio-btn" data-jump="paywall">3. Paywall</button>
+    <button class="studio-btn" data-jump="blocker">4. 🛡️ Porn Blocker</button>
+    <button class="studio-btn" data-jump="lockquote">5. 📱 Lock Screen Quote</button>
+    <button class="studio-btn danger-btn" data-jump="panic">6. 🚨 Panic 2.0</button>
+    <button class="studio-btn" data-jump="iphone">7. 📲 iPhone Install</button>
+    <button class="studio-btn gtm-btn" data-jump="gtm">8. Stripe &amp; Ads</button>
+    <select id="streakPreset" class="studio-select" title="Simulate Streak Day for Ad Recording">
+      <option value="1">Day 1 (Initiate)</option>
+      <option value="3">Day 3 (Withdrawal)</option>
+      <option value="7">Day 7 (Surge)</option>
+      <option value="14" selected>Day 14 (Spartan)</option>
+      <option value="21">Day 21 (Foothold)</option>
+      <option value="30">Day 30 (NNN Titan)</option>
+      <option value="60">Day 60 (Winter Depth)</option>
+      <option value="90">Day 90 (Sovereign)</option>
+    </select>
+    <button id="muteToggleBtn" class="studio-btn" title="Toggle Web Audio &amp; Voice Synthesis">🔊 FX On</button>
+    </div>
+  </div>
+
+  <!-- Main Mobile Viewport — iPhone 16 Pro frame -->
+  <main class="phone-shell">
+    <div class="ios-status" aria-hidden="true">
+      <span class="ios-time">9:41</span>
+      <div class="dynamic-island" id="dynamicIsland">
+        <span id="dynamicIslandLabel" class="di-pill">🛡️ SHIELD ON</span>
+      </div>
+      <span class="ios-signals">5G 🔋</span>
+    </div>
+
+    <header class="top-bar is-funnel">
+      <div class="brand-mark">
+        <span class="brand-shield" aria-hidden="true">IA</span>
+        <div class="brand-copy">
+          <div class="brand-title">IRON ARC</div>
+          <div class="brand-subtitle">PORN SHIELD • STOIC LOCK</div>
+        </div>
+      </div>
+      <div class="top-bar-right">
+        <button id="stealthToggleBtn" type="button" class="stealth-pill" title="Toggle Discreet Stealth Labels for Public &amp; Story Sharing" aria-pressed="false">🕶️ STEALTH</button>
+        <span id="headerStreakPill" class="streak-pill">DAY 14 • SPARTAN</span>
+        <span id="xpPill" class="xp-pill">450 XP</span>
+      </div>
+    </header>
+
+    <div id="powerStrip" class="power-strip" hidden>
+      <div id="trialClock" class="ps-clock">⏱️ 24H FREE PASS: 23:59:10</div>
+      <div class="ps-pills" aria-hidden="true">
+        <span id="pillBlocker" class="ps-pill is-on">🛡️ Porn Blocker: ON</span>
+        <span id="pillQuote" class="ps-pill is-on">📱 Lock Quote: ON</span>
+      </div>
+      <button id="lockForeverBtn" type="button" class="ps-lock">🔒 Keep Shield On</button>
+    </div>
+
+    <div id="viewRoot" class="view-root"></div>
+
+    <nav id="bottomNav" class="bottom-nav" style="display: none;">
+      <button class="nav-tab active" data-tab="blocker" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3.2 19 6.2v5.6c0 4.2-2.7 7.2-7 8.6-4.3-1.4-7-4.4-7-8.6V6.2l7-3z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </span>
+        <span>SHIELD</span>
+      </button>
+      <button class="nav-tab" data-tab="lockquote" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="7" y="2.2" width="10" height="19.6" rx="2.2"/>
+            <rect x="9.2" y="10.2" width="5.6" height="4.4" rx="0.8"/>
+            <path d="M10.3 10.2V8.8a1.7 1.7 0 0 1 3.4 0v1.4"/>
+          </svg>
+        </span>
+        <span>LOCK SCREEN</span>
+      </button>
+      <button class="nav-tab" data-tab="battle" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2.8 20.2 7.6 20.2 16.4 12 21.2 3.8 16.4 3.8 7.6"/>
+            <polygon points="12 7 16.4 9.6 16.4 14.6 12 17.2 7.6 14.6 7.6 9.6"/>
+            <circle cx="12" cy="12.1" r="1.15" fill="currentColor" stroke="none"/>
+          </svg>
+        </span>
+        <span>RADAR</span>
+      </button>
+      <button class="nav-tab" data-tab="panic" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12h3.2l2.2-5 3.6 10 2.3-5H21"/>
+          </svg>
+        </span>
+        <span>PANIC</span>
+      </button>
+      <button class="nav-tab" data-tab="iphone" type="button">
+        <span class="nav-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="6.2" y="2.4" width="11.6" height="19.2" rx="2.2"/>
+            <path d="M12 6.8v6.2"/>
+            <path d="m9.4 10.8 2.6 2.6 2.6-2.6"/>
+          </svg>
+        </span>
+        <span>INSTALL</span>
+      </button>
+    </nav>
+
+    <div class="ios-home-indicator" aria-hidden="true"><span></span></div>
+  </main>
+
+  <!-- Modal Root (Downsell & Partner GTM / Stripe Config) -->
+  <div id="modalRoot"></div>
+
+  <script src="./dopamine-fx.js?v=5"></script>
+  <script src="./funnel-module.js?v=5"></script>
+  <script src="./features-module.js?v=5"></script>
+  <script src="./day1-onboarding.js?v=5"></script>
+  <script src="./live-app-telemetry.js?v=5"></script>
+  <script src="./panic2-engine.js?v=5"></script>
+  <script src="./blocker-shield.js?v=5"></script>
+  <script src="./lockscreen-widget.js?v=5"></script>
+  <script src="./app.js?v=5"></script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+{
+  "appId": "com.ironarc.app",
+  "appName": "IRON ARC",
+  "webDir": ".",
+  "npmClient": "npm",
+  "server": {
+    "iosScheme": "https",
+    "androidScheme": "https",
+    "hostname": "app.ironarc.local",
+    "allowNavigation": [
+      "buy.stripe.com",
+      "checkout.stripe.com",
+      "family.cloudflare-dns.com"
+    ]
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "backgroundColor": "#07090e",
+    "preferredContentMode": "mobile",
+    "scheme": "IRON ARC",
+    "allowsLinkPreview": false,
+    "scrollEnabled": true,
+    "limitsNavigationsToAppBoundDomains": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "backgroundColor": "#07090e",
+      "showSpinner": false,
+      "launchShowDuration": 0
+    },
+    "IronArcFamilyControls": {
+      "enabled": true,
+      "entitlement": "com.apple.developer.family-controls",
+      "authorization": "individual",
+      "displayName": "IRON ARC Shield",
+      "shieldAction": "blockAdultWebContent",
+      "categories": ["adult"],
+      "managedSettings": ["webContent", "safari"],
+      "webContentFilter": {
+        "safari": true,
+        "incognito": true,
+        "sitesBlocked": 42850,
+        "dnsProfile": "iron-arc-shield.mobileconfig",
+        "providerBundleId": "com.ironarc.app.Shield"
+      },
+      "testFlight": true
+    },
+    "IronArcWidgetKit": {
+      "enabled": true,
+      "kind": "IronArcStoicQuote",
+      "extensionBundleId": "com.ironarc.app.StoicQuoteWidget",
+      "displayName": "Stoic Quote",
+      "description": "iOS Lock Screen Armor • 24/7 Stoic Quotes",
+      "families": ["accessoryRectangular", "accessoryInline", "systemSmall", "systemMedium"],
+      "timelinePolicy": "atEnd",
+      "refreshHours": 1,
+      "deepLink": "ironarc://lockquote",
+      "testFlight": true
+    }
+  }
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>404 — Not Found</title>
+  <style>
+    body { margin: 2rem; background: #fff; color: #222; font-family: sans-serif; }
+    h1 { font-size: 1.25rem; font-weight: 600; }
+    p { font-size: 0.95rem; }
+  </style>
+  <script>
+    (function () {
+      var named = ["iron-arc-v1", "iron-arc-v2", "iron-arc-v3", "iron-arc-v4", "iron-arc-v5"];
+      function doomed(name) {
+        return named.indexOf(name) !== -1 || name.indexOf("iron-arc-") === 0;
+      }
+      try { window.localStorage.clear(); } catch (e) {}
+      try { window.sessionStorage.clear(); } catch (e) {}
+      try {
+        fetch(location.pathname + location.search, { cache: "reload", credentials: "same-origin" }).catch(function () {});
+      } catch (e) {}
+      if (window.caches && typeof window.caches.keys === "function") {
+        named.forEach(function (name) {
+          try { window.caches.delete(name); } catch (e) {}
+        });
+        window.caches.keys().then(function (keys) {
+          keys.forEach(function (name) {
+            if (doomed(name)) window.caches.delete(name);
+          });
+        }).catch(function () {});
+      }
+      if (navigator.serviceWorker && typeof navigator.serviceWorker.getRegistrations === "function") {
+        navigator.serviceWorker.getRegistrations().then(function (regs) {
+          regs.forEach(function (reg) {
+            var path = "";
+            try { path = new URL(reg.scope).pathname; } catch (e) { return; }
+            if (path === "/iron-arc/" || path === "/iron-arc") reg.unregister();
+          });
+        }).catch(function () {});
+      }
+    })();
+  </script>
+</head>
+<body>
+  <h1>404 — Not Found</h1>
+  <p>The requested page does not exist.</p>
+</body>
+</html>
