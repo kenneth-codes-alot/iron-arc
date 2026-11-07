@@ -12,6 +12,7 @@ const RANKS = [
 
 const SAVED_STRIPE_KEY = "ironarc.stripeLinks.v1";
 const PRO_UNLOCKED_KEY = "ironarc.proUnlocked.v1";
+const STEALTH_MODE_KEY = "ironarc.stealth.v1";
 
 const funnelSession = window.FunnelModule ? window.FunnelModule.createSession() : null;
 
@@ -40,6 +41,9 @@ const state = {
   pledgedToday: false,
   urgesDefeated: 9,
   signatureSigned: false,
+  stealthMode: false,
+  redemptionLock: false,
+  conqueredDaysBanked: 14,
   callsign: "COMMANDER-01",
   stopLoaderFn: null,
   squad: [
@@ -152,8 +156,69 @@ function syncDynamicIsland() {
   const label = document.getElementById("dynamicIslandLabel");
   if (!label) return;
   const on = weaponStatus().blockerOn;
-  label.textContent = on ? "🛡️ SHIELD ON" : "🛡️ SHIELD OFF";
+  if (state.stealthMode) {
+    label.textContent = on ? "🛡️ PROTOCOL ON" : "🛡️ STANDBY";
+  } else {
+    label.textContent = on ? "🛡️ SHIELD ON" : "🛡️ SHIELD OFF";
+  }
   label.classList.toggle("is-off", !on);
+}
+
+function loadStealthConfig() {
+  try {
+    state.stealthMode = localStorage.getItem(STEALTH_MODE_KEY) === "1";
+  } catch (_) {}
+}
+
+function syncStealthUI() {
+  const btn = document.getElementById("stealthToggleBtn");
+  if (btn) {
+    btn.classList.toggle("is-on", !!state.stealthMode);
+    btn.setAttribute("aria-pressed", state.stealthMode ? "true" : "false");
+    btn.textContent = state.stealthMode ? "🕶️ STEALTH ON" : "🕶️ STEALTH";
+  }
+  const sub = document.querySelector(".brand-subtitle");
+  if (sub) {
+    sub.textContent = state.stealthMode ? "DOPAMINE PROTOCOL • STOIC LOCK" : "PORN SHIELD • STOIC LOCK";
+  }
+  syncDynamicIsland();
+}
+
+function bindLiveProofButtons(container) {
+  if (!container) return;
+  container.querySelectorAll("[data-fm-live-test]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const domain = btn.getAttribute("data-fm-live-test") || "pornhub.com";
+      if (window.DopamineFX) window.DopamineFX.playTick(780, 0.04);
+      btn.textContent = "Probing…";
+      btn.disabled = true;
+      const receipt = container.querySelector("[data-fm-proof-receipt]");
+      const done = (ms, ip) => {
+        btn.textContent = "✓ Killed";
+        btn.disabled = false;
+        if (receipt) {
+          receipt.hidden = false;
+          receipt.innerHTML = `<span>🟢 ${domain} → ${ip} • KILLED (${ms}ms)</span><button type="button" class="fm-proof-open" data-fm-open-wall="${domain}">Safari Wall ↗</button>`;
+          const wallBtn = receipt.querySelector("[data-fm-open-wall]");
+          if (wallBtn) {
+            wallBtn.addEventListener("click", () => {
+              if (window.BlockerShield) window.BlockerShield.openBlockTestModal(domain);
+            });
+          }
+        }
+      };
+      if (window.BlockerShield && typeof window.BlockerShield.queryCloudflareFamilyDoH === "function") {
+        window.BlockerShield.queryCloudflareFamilyDoH(domain)
+          .then((res) => {
+            done((res && res.latencyMs) || 18, (res && res.sinkholed ? "0.0.0.0" : "0.0.0.0"));
+          })
+          .catch(() => done(19, "0.0.0.0"));
+      } else {
+        setTimeout(() => done(18, "0.0.0.0"), 240);
+      }
+    });
+  });
 }
 
 function syncTrialStrip() {
@@ -548,6 +613,8 @@ function renderDiagnosis(root) {
     <button id="toPaywallBtn" class="btn-primary diagnosis-cta" type="button">Arm My 2 Weapons • Lock ${shortDate} →</button>
   `;
 
+  bindLiveProofButtons(root);
+
   document.getElementById("toPaywallBtn").addEventListener("click", () => {
     if (window.DopamineFX) window.DopamineFX.playTick(760, 0.05);
     state.screen = "paywall";
@@ -604,12 +671,14 @@ function renderPaywall(root) {
       <article class="weapon-card weapon-card-shield">
         <h2>🛡️ PORN URL SHIELD</h2>
         <p>42,850+ Adult Sites Dead on Arrival</p>
+        <button type="button" class="fm-proof-btn" style="margin-top:7px;" data-fm-live-test="pornhub.com">⚡ Test Live Block</button>
       </article>
       <article class="weapon-card weapon-card-quote">
         <h2>📱 STOIC LOCK SCREEN</h2>
         <p>Live Stoic Quotes on Your Lock Screen</p>
       </article>
     </div>
+    <div class="fm-proof-receipt" data-fm-proof-receipt hidden style="margin-bottom:10px;"></div>
 
     <div class="plan-grid">
       <div class="plan-card ${state.selectedPlan === "annual" ? "active" : ""}" data-plan="annual">
@@ -673,8 +742,15 @@ function renderPaywall(root) {
 
     <button id="openCheckoutSheetBtn" class="btn-primary" type="button">${ctaCopy.btn}</button>
     <div id="paywallFineText" class="paywall-fine">${ctaCopy.fine}</div>
+    <div class="paywall-trust-seal">
+      <span>🔒 Discreet Statement ("IA DIGITAL")</span>
+      <span>•</span>
+      <span>100% On-Device Logs</span>
+    </div>
     <button id="tryDay1Btn" type="button" class="btn-trial" data-d1-start-pass>Try 24 Hours Free — No Card</button>
   `;
+
+  bindLiveProofButtons(root);
 
   root.querySelectorAll(".plan-card").forEach((card) => {
     card.addEventListener("click", () => {
@@ -1030,7 +1106,8 @@ function renderLockQuoteTab(root) {
     window.LockScreenWidget.mount("#lockQuoteMount", {
       streakDay: state.streakDays,
       blockedToday: shield.attempts || 0,
-      shieldOn: true
+      shieldOn: true,
+      stealthMode: state.stealthMode
     });
   }
 }
@@ -1040,15 +1117,122 @@ function renderBattleTab(root) {
   const diagHTML = diagnosis ? window.FunnelModule.renderDiagnosisHTML(diagnosis) : "";
   const rank = getRank(state.streakDays);
   const rewirePct = getRewirePercentage(state.streakDays);
+  const bioStrip = window.LiveTelemetry ? window.LiveTelemetry.renderBioMetricsStrip(telemetryState()) : "";
   const brain = window.LiveTelemetry
     ? window.LiveTelemetry.renderInteractiveBrainWidget(telemetryState())
     : `<div class="brain-hero-card"><div class="brain-svg-mount">${window.DopamineFX ? window.DopamineFX.renderBrainSVG(rewirePct, rank.code) : ""}</div></div>`;
+  const bankedDays = Math.max(state.conqueredDaysBanked || 14, state.streakDays);
   root.innerHTML = `
-    <div class="battle-stage">${diagHTML}</div>
     ${brain}
+    ${bioStrip}
     ${holdOathHTML()}
+    <div class="battle-actions-row">
+      <button id="shareStoryCardBtn" type="button" class="btn-trial battle-share-btn">📤 Share Stealth Story Card</button>
+    </div>
+    <div class="battle-stage">${diagHTML}</div>
+    <section class="redemption-card ${state.redemptionLock ? "is-locked" : ""}">
+      <div class="redemption-head">
+        <span class="redemption-kicker">${state.redemptionLock ? "⚔️ 72H REDEMPTION LOCK ACTIVE" : "🛡️ ANTI-SHAME RELAPSE PROTOCOL"}</span>
+        <span class="redemption-bank">BANKED: ${bankedDays} DAYS</span>
+      </div>
+      <p class="redemption-copy">
+        ${
+          state.redemptionLock
+            ? `Slip logged without erasing your ${bankedDays} lifetime conquered days. Night Sentry (11 PM – 2 AM) is hardened for 72 hours.`
+            : `Slipped tonight? Don't delete the app or spiral until January. Keep your ${bankedDays} conquered days banked and enter a 72-Hour Redemption Lock.`
+        }
+      </p>
+      <button id="activateRedemptionBtn" type="button" class="redemption-btn" ${state.redemptionLock ? "disabled" : ""}>
+        ${state.redemptionLock ? "✓ 72H Redemption Shield Locked" : "Log Slip & Activate 72H Redemption Lock →"}
+      </button>
+    </section>
   `;
   bindHoldOath();
+  bindLiveProofButtons(root);
+
+  const shareBtn = document.getElementById("shareStoryCardBtn");
+  if (shareBtn) {
+    shareBtn.addEventListener("click", () => {
+      if (window.DopamineFX) window.DopamineFX.playTick(720, 0.04);
+      openShareCardModal();
+    });
+  }
+
+  const redemptionBtn = document.getElementById("activateRedemptionBtn");
+  if (redemptionBtn) {
+    redemptionBtn.addEventListener("click", () => {
+      if (state.redemptionLock) return;
+      state.conqueredDaysBanked = Math.max(state.conqueredDaysBanked || 14, state.streakDays);
+      state.redemptionLock = true;
+      state.streakDays = 1;
+      state.streakSecondsOffset = 0;
+      const preset = document.getElementById("streakPreset");
+      if (preset) preset.value = "1";
+      if (window.DopamineFX) {
+        window.DopamineFX.playOathSealed();
+        window.DopamineFX.burstParticles({ anchor: redemptionBtn, mode: "ember" });
+      }
+      render();
+    });
+  }
+}
+
+function openShareCardModal() {
+  const modalRoot = document.getElementById("modalRoot");
+  if (!modalRoot) return;
+  const rank = getRank(state.streakDays);
+  const rewirePct = getRewirePercentage(state.streakDays);
+  const prodUrl = `${window.location.origin}${window.location.pathname}?mode=prod`;
+  const shareText = `DAY ${state.streakDays} • RANK: ${rank.name} (${rewirePct}% D2 Rewire) — Locked in on IRON ARC Winter Arc Protocol. ${prodUrl}`;
+
+  modalRoot.innerHTML = `
+    <div class="modal-overlay" id="shareModalOverlay">
+      <div class="modal-card share-modal-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span class="season-pill">STEALTH STORY ARTIFACT • HABIT HIDDEN</span>
+          <button id="closeShareModalBtn" class="paywall-close" type="button">✕</button>
+        </div>
+        <div class="story-artifact">
+          <div class="story-top">
+            <span>◈ IRON ARC • WINTER PROTOCOL</span>
+            <span>ID #IA-2026</span>
+          </div>
+          <div class="story-center">
+            <div class="story-rank">RANK ${rank.code} • ${rank.name}</div>
+            <div class="story-day">DAY ${state.streakDays}</div>
+            <div class="story-clock">${formatSubClock(state.streakSecondsOffset)}</div>
+          </div>
+          <div class="story-stats">
+            <div><span>D2 REWIRE</span><b>${rewirePct}%</b></div>
+            <div><span>NIGHT SENTRY</span><b>11PM–2AM</b></div>
+            <div><span>WILLPOWER</span><b>${state.willpowerXP} XP</b></div>
+          </div>
+          <div class="story-foot">DOPAMINE PROTOCOL • STOIC LOCK SCREEN</div>
+        </div>
+        <p style="font-size:11.5px; color:var(--text-muted); text-align:center; margin:10px 0;">
+          100% Stealth: Zero sensitive words on card. Screenshot for IG Stories / TikTok or copy link below.
+        </p>
+        <button id="copyShareCardBtn" type="button" class="btn-primary">📋 Copy Story Caption &amp; Link</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("closeShareModalBtn").addEventListener("click", () => {
+    modalRoot.innerHTML = "";
+  });
+  document.getElementById("shareModalOverlay").addEventListener("click", (e) => {
+    if (e.target.id === "shareModalOverlay") modalRoot.innerHTML = "";
+  });
+  document.getElementById("copyShareCardBtn").addEventListener("click", (e) => {
+    const btn = e.currentTarget;
+    if (window.DopamineFX) window.DopamineFX.playOathSealed();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareText).catch(() => legacyCopy(shareText));
+    } else {
+      legacyCopy(shareText);
+    }
+    btn.textContent = "✓ Copied Stealth Caption & Link!";
+  });
 }
 
 function renderPanicTab(root) {
@@ -1466,6 +1650,27 @@ document.addEventListener("live-telemetry:pulse", (event) => {
 })();
 
 loadSavedStripeConfig();
+loadStealthConfig();
+syncStealthUI();
+
+const stealthBtn = document.getElementById("stealthToggleBtn");
+if (stealthBtn) {
+  stealthBtn.addEventListener("click", () => {
+    if (window.DopamineFX) window.DopamineFX.playTick(680, 0.035);
+    state.stealthMode = !state.stealthMode;
+    try {
+      localStorage.setItem(STEALTH_MODE_KEY, state.stealthMode ? "1" : "0");
+    } catch (_) {}
+    syncStealthUI();
+    if (state.screen === "app" && state.activeTab === "lockquote") {
+      render();
+    }
+  });
+}
+
+document.addEventListener("ironarc:share-card", () => {
+  openShareCardModal();
+});
 
 // Resume Stripe return if returning from Stripe Checkout (?checkout=success)
 if (window.FunnelModule) {

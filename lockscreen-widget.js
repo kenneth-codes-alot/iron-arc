@@ -98,6 +98,7 @@
     quoteIndex: 0,
     streakDay: 14,
     shieldOn: true,
+    stealthMode: false,
     blockedToday: 3,
     lastRotatedAt: Date.now(),
     nightKey: ""
@@ -179,12 +180,14 @@
     return remain(left);
   }
 
-  function blockedLine(n) {
+  function blockedLine(n, stealth) {
     var c = Math.max(0, n | 0);
+    if (stealth) return c + " distraction" + (c === 1 ? "" : "s") + " filtered today";
     return c + " urge" + (c === 1 ? "" : "s") + " intercepted today";
   }
 
-  function islandCopy(on) {
+  function islandCopy(on, stealth) {
+    if (stealth) return on ? "Protocol On" : "Standby";
     return on ? "Shield Armed" : "Disarmed";
   }
 
@@ -201,6 +204,7 @@
     var quoteIndex = state.quoteIndex;
     var streakDay = state.streakDay;
     var shieldOn = state.shieldOn;
+    var stealthMode = state.stealthMode;
     var blockedToday = state.blockedToday;
     var now = new Date();
     if (override) {
@@ -210,6 +214,7 @@
       if (override.quoteIndex != null && isFinite(Number(override.quoteIndex))) quoteIndex = Number(override.quoteIndex);
       if (override.streakDay != null && isFinite(Number(override.streakDay))) streakDay = Number(override.streakDay);
       if (override.shieldOn != null) shieldOn = !!override.shieldOn;
+      if (override.stealthMode != null) stealthMode = !!override.stealthMode;
       if (override.blockedToday != null && isFinite(Number(override.blockedToday))) blockedToday = Number(override.blockedToday);
       if (override.now instanceof Date) now = override.now;
     }
@@ -226,6 +231,7 @@
       quote: { text: quote.text, author: quote.author, vibe: vibe },
       streakDay: streakDay,
       shieldOn: !!shieldOn,
+      stealthMode: !!stealthMode,
       blockedToday: blockedToday,
       dateLabel: formatDate(now),
       clockLabel: formatClock(now),
@@ -246,6 +252,7 @@
     if (opts.quoteIndex != null && isFinite(Number(opts.quoteIndex))) state.quoteIndex = Math.round(Number(opts.quoteIndex));
     if (opts.streakDay != null && isFinite(Number(opts.streakDay))) state.streakDay = Math.round(clamp(opts.streakDay, 0, 999));
     if (opts.shieldOn != null) state.shieldOn = !!opts.shieldOn;
+    if (opts.stealthMode != null) state.stealthMode = !!opts.stealthMode;
     if (opts.blockedToday != null && isFinite(Number(opts.blockedToday))) state.blockedToday = Math.round(Math.max(0, Number(opts.blockedToday)));
     if (typeof opts.onChange === "function") listener = opts.onChange;
     if (typeof opts.onUnlock === "function") onUnlock = opts.onUnlock;
@@ -381,8 +388,8 @@
   }
 
   function screenMarkup(s, mode) {
-    var body = s.shieldOn ? blockedLine(s.blockedToday) : "Shield off. URLs exposed";
-    var island = islandCopy(s.shieldOn);
+    var body = s.shieldOn ? blockedLine(s.blockedToday, s.stealthMode) : (s.stealthMode ? "Protocol paused" : "Shield off. URLs exposed");
+    var island = islandCopy(s.shieldOn, s.stealthMode);
     var islandEmo = s.shieldOn ? "🛡️" : "⚠️";
     var bannerLabel = "🛡️ IRON ARC • " + body;
     var home = mode === "full"
@@ -496,7 +503,10 @@
           '</div>' +
           '<div class="lsw-pills lsw-rots" role="group" aria-label="Auto rotation">' + pills(ROTATIONS, "rot", s.rotation) + '</div>' +
           '<div class="lsw-eta" data-lsw-eta>↻ ' + esc(s.etaLabel) + '</div>' +
-          '<button type="button" class="lsw-go" data-lsw-full><span>📱 Preview Full Lock Screen</span></button>' +
+          '<div class="lsw-actions">' +
+            '<button type="button" class="lsw-go" data-lsw-full><span>📱 Full Lock Screen</span></button>' +
+            '<button type="button" class="lsw-act" data-lsw-share><span>📤 Share Story Card</span></button>' +
+          '</div>' +
         '</div>' +
       '</section>';
   }
@@ -727,8 +737,8 @@
     if (!scope) return;
     var screens = scope.querySelectorAll("[data-lsw-screen]");
     var i;
-    var body = s.shieldOn ? blockedLine(s.blockedToday) : "Shield off. URLs exposed";
-    var island = islandCopy(s.shieldOn);
+    var body = s.shieldOn ? blockedLine(s.blockedToday, s.stealthMode) : (s.stealthMode ? "Protocol paused" : "Shield off. URLs exposed");
+    var island = islandCopy(s.shieldOn, s.stealthMode);
     var islandEmo = s.shieldOn ? "🛡️" : "⚠️";
     var quoted = "\u201C" + s.quote.text + "\u201D";
     var byline = "\u2014 " + s.quote.author;
@@ -798,9 +808,18 @@
       swallowClick = false;
       return;
     }
-    var t = e.target.closest("[data-lsw-theme],[data-lsw-vibe],[data-lsw-rot],[data-lsw-shuffle],[data-lsw-speak],[data-lsw-full],[data-lsw-quote],[data-lsw-flash],[data-lsw-cam],[data-lsw-shutter],[data-lsw-cam-close],[data-lsw-unlock]");
+    var t = e.target.closest("[data-lsw-theme],[data-lsw-vibe],[data-lsw-rot],[data-lsw-shuffle],[data-lsw-speak],[data-lsw-full],[data-lsw-share],[data-lsw-quote],[data-lsw-flash],[data-lsw-cam],[data-lsw-shutter],[data-lsw-cam-close],[data-lsw-unlock]");
     if (!t || !e.currentTarget.contains(t)) return;
     armAudio();
+    if (t.hasAttribute("data-lsw-share")) {
+      fxTick(720, 0.035);
+      try {
+        if (root.CustomEvent && root.document) {
+          root.document.dispatchEvent(new root.CustomEvent("ironarc:share-card", { detail: getState() }));
+        }
+      } catch (err) {}
+      return;
+    }
     if (t.hasAttribute("data-lsw-theme")) {
       state.theme = t.getAttribute("data-lsw-theme");
       fxTick(520, 0.03);

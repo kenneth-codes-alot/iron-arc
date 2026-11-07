@@ -184,6 +184,9 @@
     ".bs-livepill.is-on{color:#d1fae5;background:rgba(16,185,129,.1);border-color:rgba(52,211,153,.4)}",
     ".bs-livepill.is-wait{color:#fde68a;background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.28)}",
     ".bs-livepill.is-mute{color:#94a3b8}",
+    ".bs-sentry{margin:6px 0 0;padding:7px 10px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10.5px;font-weight:800;letter-spacing:.03em;background:rgba(99,102,241,.1);border:1px solid rgba(129,140,248,.28);color:#c7d2fe}",
+    ".bs-sentry.is-hot{background:rgba(244,63,94,.14);border-color:rgba(251,113,133,.45);color:#fecdd3}",
+    ".bs-sentry em{font-style:normal;font-size:9.5px;font-weight:900;letter-spacing:.08em;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,.08);color:#e2e8f0;white-space:nowrap}",
     ".bs-strip{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;margin:8px 0 0;text-align:left}",
     ".bs-step{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#e2e8f0;line-height:1.35}",
     ".bs-step b{flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.06);color:#94a3b8;font-size:10px;font-weight:900}",
@@ -799,6 +802,18 @@
     return "<div class='bs-receipt' data-live-receipt>" + receiptInner(lastReceipt) + "</div>";
   }
 
+  function nightSentryHTML(view) {
+    if (!view || !view.master) {
+      return "<div class='bs-sentry is-hot'><span>⚠️ NIGHT SENTRY: UNARMED (11 PM – 2 AM)</span><em>EXPOSED</em></div>";
+    }
+    var hr = new Date().getHours();
+    var inWindow = hr >= 22 || hr < 3;
+    if (inWindow) {
+      return "<div class='bs-sentry is-hot'><span>🔥 11 PM – 2 AM DANGER WINDOW</span><em>SENTRY ACTIVE</em></div>";
+    }
+    return "<div class='bs-sentry'><span>🌙 NIGHT SENTRY: 11 PM – 2 AM WINDOW</span><em>AUTO-ARMED</em></div>";
+  }
+
   function renderHTML(state) {
     ensureStyles();
     var view = state ? viewFrom(state) : model;
@@ -815,6 +830,7 @@
       (copy.sub ? "<span class='bs-sub'>" + escapeHtml(copy.sub) + "</span>" : "") +
       "</button>" +
       "<p class='bs-livepill " + pillClass(dnsState).replace("bs-livepill ", "") + "' data-dns-pill role='status' aria-live='polite'>" + escapeHtml(dnsLabel(dnsState)) + "</p>" +
+      nightSentryHTML(view) +
       guideHTML() +
       "<button type='button' class='bs-install' data-act='install'><span>📲 Activate iOS System Shield</span><em>1-TAP</em></button>" +
       "<p class='bs-foot' data-status></p>" +

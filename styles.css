@@ -346,6 +346,25 @@ html.studio-dock .studio-bar.is-open .studio-toggle {
   font-variant-numeric: tabular-nums;
 }
 
+.stealth-pill {
+  font-size: 9.5px;
+  font-weight: 800;
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.stealth-pill.is-on {
+  background: rgba(99, 102, 241, 0.18);
+  color: #c7d2fe;
+  border-color: rgba(129, 140, 248, 0.45);
+}
+
 .xp-pill {
   font-size: 10px;
   font-weight: 700;
@@ -1647,6 +1666,184 @@ html.studio-dock .studio-bar.is-open .studio-toggle {
   gap: 4px;
   font-size: 11.5px;
   color: #cbd5e1;
+}
+
+.paywall-trust-seal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 7px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.battle-actions-row {
+  margin: 8px 0 12px;
+}
+
+.battle-share-btn {
+  margin-top: 0;
+  font-weight: 800;
+  border-color: rgba(52, 211, 153, 0.35);
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.redemption-card {
+  margin: 12px 0 6px;
+  padding: 13px 12px;
+  border-radius: 16px;
+  background: rgba(244, 63, 94, 0.07);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.redemption-card.is-locked {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(52, 211, 153, 0.38);
+}
+
+.redemption-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.redemption-kicker {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #fda4af;
+}
+
+.redemption-card.is-locked .redemption-kicker {
+  color: #6ee7b7;
+}
+
+.redemption-bank {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fde68a;
+}
+
+.redemption-copy {
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  margin-bottom: 9px;
+}
+
+.redemption-btn {
+  width: 100%;
+  border: 1px solid rgba(244, 63, 94, 0.45);
+  background: rgba(244, 63, 94, 0.16);
+  color: #ffe4e6;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.redemption-card.is-locked .redemption-btn {
+  border-color: rgba(52, 211, 153, 0.4);
+  background: rgba(16, 185, 129, 0.16);
+  color: #d1fae5;
+  cursor: default;
+}
+
+.story-artifact {
+  padding: 18px 16px;
+  border-radius: 20px;
+  background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.22), transparent 58%), linear-gradient(165deg, #101726 0%, #05070a 100%);
+  border: 1px solid rgba(52, 211, 153, 0.42);
+  text-align: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.story-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #6ee7b7;
+  margin-bottom: 16px;
+}
+
+.story-center {
+  margin: 8px 0 16px;
+}
+
+.story-rank {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  color: #fbbf24;
+}
+
+.story-day {
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 4px 0;
+}
+
+.story-clock {
+  display: inline-block;
+  font-family: "SF Mono", ui-monospace, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.story-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 12px;
+}
+
+.story-stats span {
+  display: block;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.story-stats b {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+.story-foot {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
 }
 
 /* Desktop preview keeps the iPhone 16 Pro bezel, fake status bar, and home indicator. */

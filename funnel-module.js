@@ -805,7 +805,9 @@
     return '<div class="fm-weapons">' +
       '<p class="fm-kicker">YOUR 2-WEAPON SYSTEM</p>' +
       '<article class="fm-weapon"><span class="fm-weapon-ico" aria-hidden="true">🛡️</span>' +
-      '<span class="fm-weapon-copy"><strong>01 • URL SHIELD</strong><b>Hard Porn URL Blocker</b><em>Kills 42,850+ Sites in Safari</em></span></article>' +
+      '<span class="fm-weapon-copy"><strong>01 • URL SHIELD</strong><b>Hard Porn URL Blocker</b><em>Kills 42,850+ Sites in Safari</em></span>' +
+      '<button type="button" class="fm-proof-btn" data-fm-live-test="pornhub.com">⚡ Test Live</button></article>' +
+      '<div class="fm-proof-receipt" data-fm-proof-receipt hidden></div>' +
       '<article class="fm-weapon"><span class="fm-weapon-ico" aria-hidden="true">📱</span>' +
       '<span class="fm-weapon-copy"><strong>02 • LOCK SCREEN</strong><b>Stoic Lock Screen Widget</b><em>Live Quote + Streak on Every Glance</em></span></article>' +
       "</div>";
@@ -1693,10 +1695,15 @@
     ".fm-rewire-milestones b{display:block;color:#34d399;font-size:10px;letter-spacing:.04em;text-transform:uppercase}",
     ".fm-weapon{display:flex;gap:10px;align-items:center;padding:12px;border-radius:14px;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08)}",
     ".fm-weapon-ico{font-size:18px;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none;line-height:1;background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.07)}",
-    ".fm-weapon-copy{display:flex;flex-direction:column;gap:1px;min-width:0}",
+    ".fm-weapon-copy{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}",
     ".fm-weapon-copy strong{font-size:10px;letter-spacing:.14em;color:#8fb8aa}",
     ".fm-weapon-copy b{font-size:14px;line-height:1.25;color:#f8fafc;font-weight:800}",
     ".fm-weapon-copy em{font-style:normal;font-size:12px;font-weight:600;color:#94a3b8}",
+    ".fm-proof-btn{flex:none;border:1px solid rgba(52,211,153,0.45);background:rgba(16,185,129,0.14);color:#6ee7b7;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;letter-spacing:.02em;cursor:pointer;white-space:nowrap}",
+    ".fm-proof-btn:active{transform:scale(.97)}",
+    ".fm-proof-receipt{padding:8px 10px;border-radius:11px;background:rgba(16,185,129,0.1);border:1px solid rgba(52,211,153,0.35);color:#d1fae5;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}",
+    ".fm-proof-receipt[hidden]{display:none!important}",
+    ".fm-proof-open{color:#6ee7b7;background:none;border:0;font:inherit;font-weight:800;text-decoration:underline;cursor:pointer;padding:0;white-space:nowrap}",
     ".fm-target{margin-top:14px}",
     ".fm-overlay{position:fixed;inset:0;z-index:240;background:rgba(2,6,14,.72);display:flex;align-items:flex-end;justify-content:center}",
     ".fm-overlay-contained{position:fixed;inset:auto}",
