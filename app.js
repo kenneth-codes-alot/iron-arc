@@ -13,6 +13,18 @@ const RANKS = [
 const SAVED_STRIPE_KEY = "ironarc.stripeLinks.v1";
 const PRO_UNLOCKED_KEY = "ironarc.proUnlocked.v1";
 const STEALTH_MODE_KEY = "ironarc.stealth.v1";
+const STREAK_START_KEY = "ironarc.streakStartedAt.v1";
+
+const PLAN_PIXEL_VALUES = {
+  annual: 29.99,
+  monthly: 9.99,
+  downsell: 14.99,
+  penaltyStake: 15,
+  sovereign: 39
+};
+
+const pixelOnce = Object.create(null);
+let customerStreakLoaded = false;
 
 const funnelSession = window.FunnelModule ? window.FunnelModule.createSession() : null;
 
@@ -54,10 +66,29 @@ const state = {
   ]
 };
 
+function isProdMode() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    return params.get("mode") === "prod" || standalone === true;
+  } catch (_) {
+    return false;
+  }
+}
+
 function markProUnlocked() {
+  let stampedFresh = false;
   try {
     localStorage.setItem(PRO_UNLOCKED_KEY, "1");
+    if (!localStorage.getItem(STREAK_START_KEY)) {
+      localStorage.setItem(STREAK_START_KEY, String(Date.now()));
+      stampedFresh = true;
+    }
   } catch (_) {}
+  if (stampedFresh && isProdMode()) {
+    state.streakDays = 1;
+    state.streakSecondsOffset = 0;
+  }
 }
 
 function isProUnlocked() {
@@ -67,6 +98,78 @@ function isProUnlocked() {
     return false;
   }
 }
+
+function loadCustomerStreak() {
+  if (customerStreakLoaded || !isProdMode() || !isProUnlocked()) return;
+  let startedAt = NaN;
+  try {
+    startedAt = parseInt(localStorage.getItem(STREAK_START_KEY), 10);
+  } catch (_) {
+    startedAt = NaN;
+  }
+  if (!startedAt) {
+    startedAt = Date.now();
+    try {
+      localStorage.setItem(STREAK_START_KEY, String(startedAt));
+    } catch (_) {}
+  }
+  customerStreakLoaded = true;
+  state.streakDays = Math.max(1, Math.floor((Date.now() - startedAt) / 86400000) + 1);
+  state.streakSecondsOffset = Math.floor(((Date.now() - startedAt) % 86400000) / 1000);
+  if (state.streakSecondsOffset < 0) state.streakSecondsOffset = 0;
+  state.conqueredDaysBanked = state.streakDays;
+}
+
+function trackPixelEvent(eventName, payload) {
+  const data = payload && typeof payload === "object" ? payload : {};
+  const ref = data.clientReferenceId || "";
+  if (ref && (eventName === "Purchase" || eventName === "CompletePayment")) {
+    const dedupeKey = eventName + ":" + ref;
+    if (pixelOnce[dedupeKey]) return;
+    pixelOnce[dedupeKey] = true;
+  }
+  try {
+    if (!Array.isArray(window.__iaPixelLog)) window.__iaPixelLog = [];
+    window.__iaPixelLog.push({
+      eventName: eventName,
+      payload: data,
+      at: Date.now()
+    });
+  } catch (_) {}
+  try {
+    if (typeof window.fbq === "function") window.fbq("track", eventName, data);
+  } catch (_) {}
+  try {
+    if (window.ttq && typeof window.ttq.track === "function") window.ttq.track(eventName, data);
+  } catch (_) {}
+}
+
+window.trackPixelEvent = trackPixelEvent;
+window.__iaPixelLog = window.__iaPixelLog || [];
+
+function trackOnce(key, eventName, payload) {
+  if (pixelOnce[key]) return;
+  pixelOnce[key] = true;
+  trackPixelEvent(eventName, payload);
+}
+
+function trackCheckoutPixels(result) {
+  const planId = (result && result.planId) || "annual";
+  const payload = {
+    content_name: planId,
+    content_ids: [planId],
+    currency: (result && result.currency) || "USD",
+    value: Object.prototype.hasOwnProperty.call(PLAN_PIXEL_VALUES, planId)
+      ? PLAN_PIXEL_VALUES[planId]
+      : PLAN_PIXEL_VALUES.annual,
+    planId: planId
+  };
+  if (result && result.clientReferenceId) payload.clientReferenceId = result.clientReferenceId;
+  trackPixelEvent("Purchase", payload);
+  trackPixelEvent("CompletePayment", payload);
+}
+
+window.trackCheckoutPixels = trackCheckoutPixels;
 
 // Load saved Stripe Payment Links from localStorage if configured
 function loadSavedStripeConfig() {
@@ -109,6 +212,10 @@ function updateXPPill() {
 function syncHeaderStreak() {
   const pill = document.getElementById("headerStreakPill");
   if (!pill) return;
+  if (isProdMode() && state.screen !== "app") {
+    pill.textContent = "DAY 0 → 90";
+    return;
+  }
   const rank = getRank(state.streakDays);
   pill.textContent = `DAY ${state.streakDays} • ${rank.name}`;
 }
@@ -353,6 +460,7 @@ function renderHoloPass(subtitleText) {
 }
 
 function render() {
+  loadCustomerStreak();
   if (state.stopLoaderFn) {
     state.stopLoaderFn();
     state.stopLoaderFn = null;
@@ -399,6 +507,12 @@ function renderQuiz(root) {
   const steps = window.FunnelModule.QUIZ_STEPS;
   const idx = funnelSession.stepIndex;
   const step = steps[idx];
+  if (idx === 0) {
+    trackOnce("pixel:view-content", "ViewContent", {
+      content_name: "IRON ARC Quiz",
+      content_category: "NNN"
+    });
+  }
   const pct = Math.round(((idx + 1) / steps.length) * 100);
   const currentAns = funnelSession.answers[step.id];
 
@@ -607,6 +721,10 @@ function renderDiagnosis(root) {
   const diagnosis = window.FunnelModule.buildDiagnosis(funnelSession);
   const diagHTML = window.FunnelModule.renderDiagnosisHTML(diagnosis);
   const shortDate = formatShortTargetDate(diagnosis);
+  trackOnce("pixel:complete-registration", "CompleteRegistration", {
+    content_name: "BATTLE RADAR",
+    status: String(diagnosis.dependencyScore)
+  });
 
   root.innerHTML = `
     ${diagHTML}
@@ -650,10 +768,98 @@ function getPaywallCtaCopy(planId, bumpChecked) {
   };
 }
 
+function isRestoreCredential(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return false;
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) return true;
+  const code = raw.toUpperCase();
+  return code.indexOf("IA-") !== -1 || code.indexOf("FOUNDER") !== -1 || code.indexOf("2026") !== -1;
+}
+
+function openRestoreAccessModal() {
+  const modalRoot = document.getElementById("modalRoot");
+  if (!modalRoot) return;
+  modalRoot.innerHTML = `
+    <div class="modal-overlay" id="restoreModalOverlay">
+      <div class="modal-card restore-access-card" role="dialog" aria-modal="true" aria-labelledby="restoreAccessTitle">
+        <div class="season-pill" style="display:inline-block; margin-bottom: 10px;">FOUNDER ACCESS</div>
+        <h2 id="restoreAccessTitle">Restore your unlock</h2>
+        <p class="restore-access-copy">TikTok and Instagram keep a separate browser from iPhone Safari. Enter the email from checkout, or your Founder Pass code, and this browser picks up the same access.</p>
+        <label class="restore-access-label" for="restoreAccessInput">Email or Founder Pass</label>
+        <input id="restoreAccessInput" class="restore-access-input" type="text" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@email.com or IA-2026" />
+        <p id="restoreAccessError" class="restore-access-error" hidden>Enter the checkout email or Founder Pass code.</p>
+        <button id="restoreAccessSubmit" class="btn-primary restore-access-submit" type="button">Restore Access →</button>
+        <button id="restoreAccessCancel" class="restore-access-cancel" type="button">Not now</button>
+      </div>
+    </div>
+  `;
+
+  const input = document.getElementById("restoreAccessInput");
+  const errorEl = document.getElementById("restoreAccessError");
+  const overlay = document.getElementById("restoreModalOverlay");
+
+  const close = () => {
+    modalRoot.innerHTML = "";
+  };
+
+  const submit = () => {
+    const value = input ? input.value : "";
+    if (!isRestoreCredential(value)) {
+      if (errorEl) errorEl.hidden = false;
+      if (input) input.focus();
+      if (window.DopamineFX) window.DopamineFX.playTick(220, 0.04);
+      return;
+    }
+    markProUnlocked();
+    if (window.Day1Module) window.Day1Module.markUpgraded();
+    if (window.DopamineFX) window.DopamineFX.playOathSealed();
+    if (!isProdMode()) {
+      state.streakDays = 1;
+      state.streakSecondsOffset = 0;
+      state.conqueredDaysBanked = 1;
+      const preset = document.getElementById("streakPreset");
+      if (preset) preset.value = "1";
+    }
+    state.activeTab = "blocker";
+    state.screen = "app";
+    close();
+    render();
+  };
+
+  document.getElementById("restoreAccessSubmit").addEventListener("click", submit);
+  document.getElementById("restoreAccessCancel").addEventListener("click", () => {
+    if (window.DopamineFX) window.DopamineFX.playTick(420, 0.03);
+    close();
+  });
+  if (overlay) {
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) close();
+    });
+  }
+  if (input) {
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        submit();
+      }
+    });
+    input.focus();
+  }
+}
+
 function renderPaywall(root) {
   const diagnosis = window.FunnelModule.buildDiagnosis(funnelSession);
   const shortDate = formatShortTargetDate(diagnosis);
   const ctaCopy = getPaywallCtaCopy(state.selectedPlan, state.precheckPenaltyBump);
+  trackOnce("pixel:initiate:" + state.selectedPlan, "InitiateCheckout", {
+    content_name: "IRON ARC Pro",
+    content_ids: [state.selectedPlan],
+    currency: "USD",
+    value: Object.prototype.hasOwnProperty.call(PLAN_PIXEL_VALUES, state.selectedPlan)
+      ? PLAN_PIXEL_VALUES[state.selectedPlan]
+      : PLAN_PIXEL_VALUES.annual,
+    planId: state.selectedPlan
+  });
 
   root.innerHTML = `
     <div class="paywall-header">
@@ -742,6 +948,7 @@ function renderPaywall(root) {
 
     <button id="openCheckoutSheetBtn" class="btn-primary" type="button">${ctaCopy.btn}</button>
     <div id="paywallFineText" class="paywall-fine">${ctaCopy.fine}</div>
+    <button id="restoreAccessBtn" type="button" class="paywall-restore-link">Already unlocked on another browser? Restore Access</button>
     <div class="paywall-trust-seal">
       <span>🔒 Discreet Statement ("IA DIGITAL")</span>
       <span>•</span>
@@ -781,6 +988,7 @@ function renderPaywall(root) {
       bumpIds: initialBumps,
       diagnosis,
       onSuccess(result) {
+        trackCheckoutPixels(result);
         if (window.DopamineFX) {
           window.DopamineFX.playOathSealed();
           window.DopamineFX.burstParticles({ mode: "rank" });
@@ -803,6 +1011,14 @@ function renderPaywall(root) {
   if (day1PassBtn) {
     day1PassBtn.addEventListener("click", () => {
       enterDay1Pass();
+    });
+  }
+
+  const restoreBtn = document.getElementById("restoreAccessBtn");
+  if (restoreBtn) {
+    restoreBtn.addEventListener("click", () => {
+      if (window.DopamineFX) window.DopamineFX.playTick(640, 0.035);
+      openRestoreAccessModal();
     });
   }
 
@@ -864,6 +1080,7 @@ function openDownsellModal() {
       bumpIds: [],
       diagnosis,
       onSuccess(result) {
+        trackCheckoutPixels(result);
         if (window.DopamineFX) {
           window.DopamineFX.playOathSealed();
           window.DopamineFX.burstParticles({ mode: "seal" });
@@ -994,6 +1211,7 @@ function upgradeFromDay1() {
     bumpIds: initialBumps,
     diagnosis,
     onSuccess(result) {
+      trackCheckoutPixels(result);
       markProUnlocked();
       if (window.Day1Module) window.Day1Module.markUpgraded();
       if (window.DopamineFX) {
@@ -1582,18 +1800,58 @@ if (lockForeverBtn) {
   });
 }
 
-// Live 1-second ticker for the streak subclock
-setInterval(() => {
-  state.streakSecondsOffset += 1;
+function paintStreakClock() {
   const clockEl = document.getElementById("liveSubClock");
-  if (clockEl) {
-    clockEl.textContent = formatSubClock(state.streakSecondsOffset);
-  }
+  if (clockEl) clockEl.textContent = formatSubClock(state.streakSecondsOffset);
   if (window.LiveTelemetry && window.LiveTelemetry.noteOffset) {
     window.LiveTelemetry.noteOffset(state.streakSecondsOffset);
   }
+}
+
+function syncLiveCustomerClock() {
+  if (!isProdMode() || !isProUnlocked() || state.redemptionLock) return;
+  let startedAt = NaN;
+  try {
+    startedAt = parseInt(localStorage.getItem(STREAK_START_KEY), 10);
+  } catch (_) {
+    return;
+  }
+  if (!startedAt) return;
+  const nextDay = Math.max(1, Math.floor((Date.now() - startedAt) / 86400000) + 1);
+  let nextOffset = Math.floor(((Date.now() - startedAt) % 86400000) / 1000);
+  if (nextOffset < 0) nextOffset = 0;
+  const dayChanged = nextDay !== state.streakDays;
+  state.streakDays = nextDay;
+  state.streakSecondsOffset = nextOffset;
+  if (dayChanged) {
+    state.conqueredDaysBanked = Math.max(state.conqueredDaysBanked || nextDay, nextDay);
+    syncHeaderStreak();
+  }
+  paintStreakClock();
+}
+
+// Live 1-second ticker for the streak subclock.
+// Paying customers advance from the stored Day-1 timestamp so iPhone timer
+// throttling cannot leave the clock behind. Studio keeps the Day 14 preset.
+setInterval(() => {
+  if (isProdMode() && isProUnlocked() && !state.redemptionLock) {
+    syncLiveCustomerClock();
+  } else {
+    state.streakSecondsOffset += 1;
+    if (isProdMode() && isProUnlocked() && state.streakSecondsOffset >= 86400) {
+      state.streakSecondsOffset = 0;
+      state.streakDays += 1;
+      state.conqueredDaysBanked = Math.max(state.conqueredDaysBanked || 1, state.streakDays);
+      syncHeaderStreak();
+    }
+    paintStreakClock();
+  }
   syncTrialStrip();
 }, 1000);
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") syncLiveCustomerClock();
+});
 
 document.addEventListener("live-telemetry:panic", (event) => {
   event.preventDefault();
@@ -1616,9 +1874,7 @@ document.addEventListener("live-telemetry:pulse", (event) => {
   const bar = document.getElementById("studioBar");
   const toggle = document.getElementById("studioToggle");
   if (!bar || !toggle) return;
-  const params = new URLSearchParams(window.location.search);
-  const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-  const prod = params.get("mode") === "prod" || standalone;
+  const prod = isProdMode();
   const mq = window.matchMedia("(max-width: 520px)");
 
   if (prod) {
@@ -1677,6 +1933,7 @@ if (window.FunnelModule) {
   const resumed = window.FunnelModule.resumeCheckout({
     mount: document.body,
     onSuccess(pending) {
+      trackCheckoutPixels(pending);
       markProUnlocked();
       if (window.Day1Module) window.Day1Module.markUpgraded();
       state.screen = "app";
@@ -1688,6 +1945,10 @@ if (window.FunnelModule) {
     }
   });
   if (resumed && resumed.status === "success") {
+    if (!resumed.pending) {
+      const returnPlan = new URLSearchParams(window.location.search).get("plan") || "annual";
+      trackCheckoutPixels({ planId: returnPlan });
+    }
     markProUnlocked();
     if (window.Day1Module) window.Day1Module.markUpgraded();
     state.screen = "app";
@@ -1697,9 +1958,7 @@ if (window.FunnelModule) {
 // On customer ?mode=prod or standalone Home Screen launch, route returning unlocked
 // or active Day-1 Pass users straight into their Shield dashboard.
 (function restoreCustomerSession() {
-  const params = new URLSearchParams(window.location.search);
-  const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
-  if (params.get("mode") !== "prod" && !standalone) return;
+  if (!isProdMode()) return;
   if (isProUnlocked()) {
     state.screen = "app";
     return;

@@ -1292,6 +1292,26 @@
         "</div></div></div>";
   }
 
+  function trackCheckoutPixels(result) {
+    if (typeof root.trackCheckoutPixels === "function") {
+      root.trackCheckoutPixels(result);
+      return;
+    }
+    if (typeof root.trackPixelEvent !== "function") return;
+    var planId = (result && result.planId) || "annual";
+    var values = { annual: 29.99, monthly: 9.99, downsell: 14.99, penaltyStake: 15, sovereign: 39 };
+    var payload = {
+      content_name: planId,
+      content_ids: [planId],
+      currency: (result && result.currency) || "USD",
+      value: Object.prototype.hasOwnProperty.call(values, planId) ? values[planId] : values.annual,
+      planId: planId
+    };
+    if (result && result.clientReferenceId) payload.clientReferenceId = result.clientReferenceId;
+    root.trackPixelEvent("Purchase", payload);
+    root.trackPixelEvent("CompletePayment", payload);
+  }
+
   function mountCheckoutSheet(options) {
     assertDom();
     ensureStyles();
@@ -1409,6 +1429,7 @@
         preview +
         '<button type="button" class="fm-pay" data-enter>Enter the protocol</button></div>';
       body.querySelector("[data-enter]").addEventListener("click", function () {
+        trackCheckoutPixels(result);
         if (settings.onSuccess) settings.onSuccess(result);
       });
     }
@@ -1583,6 +1604,7 @@
       return { status: "follow-up", pending: pending, next: next, url: url };
     }
     completePendingCheckout();
+    trackCheckoutPixels(pending);
     if (settings.onSuccess) settings.onSuccess(pending);
     return { status: "success", pending: pending };
   }
